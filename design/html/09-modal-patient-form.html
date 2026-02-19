@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedQuest CRM - Добавить пациента</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<!-- Background Content (Blurred Patients List) -->
+<div class="fixed inset-0 z-0 flex flex-col blur-sm grayscale-[20%] pointer-events-none">
+<!-- Top Navigation Mockup -->
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-10 py-3">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-primary">
+<span class="material-symbols-outlined text-3xl">medical_services</span>
+<h2 class="text-slate-900 dark:text-slate-100 text-lg font-bold">MedQuest CRM</h2>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-primary font-medium border-b-2 border-primary pb-1">Пациенты</span>
+<span class="text-slate-500">Приемы</span>
+<span class="text-slate-500">Сообщения</span>
+<span class="text-slate-500">Аналитика</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-slate-200 dark:bg-slate-700" data-alt="User profile placeholder"></div>
+</div>
+</header>
+<!-- Main Content Mockup -->
+<main class="flex-1 px-10 py-8">
+<div class="flex justify-between items-center mb-6">
+<h1 class="text-2xl font-bold">Список пациентов</h1>
+<button class="bg-primary text-white px-4 py-2 rounded-lg font-medium">Новый пациент</button>
+</div>
+<div class="w-full bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="grid grid-cols-5 p-4 border-b border-slate-100 dark:border-slate-800 font-medium text-slate-500">
+<div>ФИО</div>
+<div>Дата рождения</div>
+<div>Телефон</div>
+<div>Последний визит</div>
+<div>Статус</div>
+</div>
+<div class="divide-y divide-slate-100 dark:divide-slate-800">
+<div class="grid grid-cols-5 p-4">
+<div class="font-medium">Иванов Иван Иванович</div>
+<div>12.05.1985</div>
+<div>+7 (900) 123-45-67</div>
+<div>15.10.2023</div>
+<div><span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider">Активен</span></div>
+</div>
+<div class="grid grid-cols-5 p-4">
+<div class="font-medium">Петрова Анна Сергеевна</div>
+<div>28.09.1992</div>
+<div>+7 (911) 987-65-43</div>
+<div>20.10.2023</div>
+<div><span class="px-2 py-1 rounded bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider">Активен</span></div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Modal Backdrop -->
+<div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+<!-- Modal Container (560px wide) -->
+<div class="bg-white dark:bg-slate-900 w-full max-w-[560px] rounded-xl shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+<!-- Modal Header -->
+<div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+<h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Добавить пациента</h2>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<!-- Modal Body (Form) -->
+<div class="px-6 py-6 space-y-5">
+<!-- Full Name field with validation error -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        ФИО <span class="text-red-500">*</span>
+</label>
+<input class="w-full px-4 py-2.5 rounded-lg border border-red-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="Введите ФИО" type="text" value=""/>
+<span class="text-xs text-red-500 font-medium">Поле обязательно для заполнения</span>
+</div>
+<!-- Date of Birth (Simulated Date Picker) -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Дата рождения <span class="text-red-500">*</span>
+</label>
+<div class="relative group">
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="ДД.ММ.ГГГГ" type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                            calendar_today
+                        </span>
+</div>
+</div>
+<!-- Phone (Masked Input) -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Телефон <span class="text-red-500">*</span>
+</label>
+<div class="relative group">
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="+7 (___) ___-__-__" type="tel" value="+7 ("/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                            call
+                        </span>
+</div>
+</div>
+<!-- Email (Optional) -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Email</label>
+<div class="relative group">
+<input class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all" placeholder="example@mail.com" type="email"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors">
+                            mail
+                        </span>
+</div>
+</div>
+<!-- Address (2-row textarea) -->
+<div class="flex flex-col gap-1.5">
+<label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Адрес</label>
+<textarea class="w-full px-4 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none" placeholder="Город, улица, дом, квартира" rows="2"></textarea>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="flex items-center justify-between px-6 py-5 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
+<span class="text-sm text-slate-500 dark:text-slate-400">
+<span class="text-red-500">*</span> обязательные поля
+                </span>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                        Отмена
+                    </button>
+<button class="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-semibold shadow-sm transition-colors">
+                        Сохранить
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Calendar Floating Example (Partial View) -->
+<!-- This would normally appear when interacting with the date field -->
+<!-- Hidden by default in this layout context -->
+</body></html>

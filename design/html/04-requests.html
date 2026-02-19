@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedQuest CRM Patient Requests Directory</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .filled-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        tr:hover { background-color: rgba(36, 99, 235, 0.03); }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex">
+<!-- Sidebar -->
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col fixed h-full z-50">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary rounded-lg p-1.5">
+<span class="material-symbols-outlined text-white text-2xl">medical_services</span>
+</div>
+<div>
+<h1 class="text-slate-900 dark:text-white text-lg font-bold leading-none">MedQuest</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">CRM Система</p>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Дашборд</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined filled-icon">list_alt</span>
+<span class="text-sm font-medium">Запросы</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Пациенты</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">person_book</span>
+<span class="text-sm font-medium">Врачи</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="text-sm font-medium">Расписание</span>
+</a>
+<div class="pt-4 pb-2 px-3">
+<p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Настройки</p>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Настройки</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2">
+<img alt="Avatar" class="w-8 h-8 rounded-full border border-slate-200" data-alt="Portrait of a medical professional doctor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyzhyEvJu28xPk8rxHGm2TfQ0Ane7ylUtZRkd-wvsUE_-LEo2AL0X618uZUuIxZFfWZgSfn-4qZE3i77tXNe1LmHCGOvNVrNsigr9kHF42q1pCNtJCPWsmQOOCmQymTNJMTYKL2MImz2zabBJGRG_zG8bu6klHf8LdUDmEdIRQ6dpoOX2rViU0e17IagHH19i6jgAj6U9N1gODLoghaAQ3kTDD84FoCjEVpCbcz2-XdR4WbXjs-yQ0Wpt5N3wC2txXU6WAAfbj42ZN"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-slate-900 dark:text-white truncate">Д-р Колесников</p>
+<p class="text-xs text-slate-500 dark:text-slate-400 truncate">Администратор</p>
+</div>
+<span class="material-symbols-outlined text-slate-400 cursor-pointer">logout</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-[240px] p-8">
+<!-- Header -->
+<header class="flex flex-wrap items-center justify-between gap-4 mb-8">
+<div>
+<h2 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Запросы пациентов</h2>
+<p class="text-slate-500 dark:text-slate-400 mt-1">Управление входящими обращениями и записями</p>
+</div>
+<button class="flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add</span>
+<span>Создать запрос</span>
+</button>
+</header>
+<!-- Filters -->
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 mb-6 flex flex-wrap gap-4 items-center">
+<div class="flex-1 min-w-[200px]">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-none rounded-lg text-sm focus:ring-2 focus:ring-primary/20" placeholder="Поиск по пациенту или ID..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<select class="bg-slate-50 dark:bg-slate-800 border-none text-sm rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option>Все статусы</option>
+<option>Новые</option>
+<option>В работе</option>
+<option>Закрытые</option>
+</select>
+<select class="bg-slate-50 dark:bg-slate-800 border-none text-sm rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option>Любой приоритет</option>
+<option>Высокий (4-5)</option>
+<option>Средний (3)</option>
+<option>Низкий (1-2)</option>
+</select>
+<select class="bg-slate-50 dark:bg-slate-800 border-none text-sm rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-primary/20 cursor-pointer">
+<option>Выберите врача</option>
+<option>Д-р Иванов</option>
+<option>Д-р Петров</option>
+<option>Д-р Смирнова</option>
+</select>
+<button class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 border border-transparent hover:border-slate-200 transition-all">
+<span class="material-symbols-outlined text-sm">calendar_month</span>
+<span>Период дат</span>
+<span class="material-symbols-outlined text-sm">expand_more</span>
+</button>
+</div>
+</div>
+<!-- Table Container -->
+<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-bottom border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-24">ID</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Пациент</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Заголовок</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Статус</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Приоритет</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Врач</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Дата</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Действия</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1024</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Иванов Иван И.</div>
+<div class="text-xs text-slate-500">+7 (900) 123-44-55</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Боли в животе</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Жалоба на острые боли в эпигастрии...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Новый</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a female doctor with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_dMtJW2edTPSZaPPKEmwP4Fu8J6szAZjNQ1lkEQaImYH3gJFV1hU-ZdWJO7IayRBBa_4F4aGsiIGqPI_3EXLRI0M7BlczjIcPy0MsdEx8K3kOEFucvw3z0F8qu2kgoIrp8NEEdAfAtPt-Wq_0E80QWvIhWvDCfJWXi3Y7SXVPvsMGtnKbf7HocC1lgmn4UOvrOAZ9egvxnldr7h1bHA5pHyqnCq1_L02nGQ-_moiVL798clA3UP3RzeRkGrcQpmYB6iCzdAa7sINi"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Смирнова</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">12.10.2023, 14:30</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1023</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Петрова Анна С.</div>
+<div class="text-xs text-slate-500">+7 (900) 555-66-77</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Запись на МРТ</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Запись на МРТ коленного сустава...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">В работе</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a male doctor in a white coat" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6zbs0uZ0-yz5a2i0RT_lCjeEv2kVuUoYv6wMaKFs9XJHnYeKKRqepzk2HTdf0Tz3GaWwU-B6E4GVIBBd1UIHQyvwoXE8sXezfiRvF_o39PcKhbst42S06TNOLvMtaqx02dmqQearxltDrPJ11lHQxbbov2yWEQzidje60k7P55ijWfXz2Z7fwvoCE-0kGjSBLS2sadqa7Mw-Mk7NXvxoJt_S67Dri5Y-vVvjvbrx7TwXvhkQGWbeeOcgLn9oguZJNDErjC1gYXyO7"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Иванов</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">12.10.2023, 11:15</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1022</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Смирнов Кирилл В.</div>
+<div class="text-xs text-slate-500">+7 (911) 222-33-44</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Результаты анализов</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Консультация по результатам биохимии...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Закрытый</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a smiling male medical professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBssfRL6H4kq7gv9SlXa_dxX9hV7ULNfHoBqZCkoFp_X8zsT7W6wOv4eeqAzltiAMLyjcURaVWZNLTCgXLVntmjvImyc271GCjIdhnXDDh5fuuRJntZQGH-6ibok8hOtKUg6rJJxXWdS1_acValBG8bEDRvsQiH9BTWnqJq1Rbp7RW0Mo8iQOJsUuHntwCjmeHMDQgz1aGwe5Qfv30ETd1tDrKY-UiKaiP5FFi2l_MQ51os08Rt4R3mvqCx0NTkGwZzr7OCL75z0uh-"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Петров</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">11.10.2023, 16:45</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1021</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Дмитриева Ольга П.</div>
+<div class="text-xs text-slate-500">+7 (922) 333-44-55</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Рецепт на инсулин</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Запрос на продление электронного рецепта...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Новый</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a female doctor with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYYoHwPd5WbdvQ24_BhGMxOJXJosOxvyIjNLstO9ICcpCBnK_61nPFxJS3IcaMUBTke3G69MpOXv3MSzxTl2KHlBw7qjfdc1uuv33jaVfhr1ICj8q8vIFm32IyghCkoPy4QXHrqv_Eczu9U3bL9wP07Cvq5zq0QIYPELBQgVYotYTy1FpZUgKudk9fSjW3_Gsr3g1mwCTnd07pi5Pkh5haSlQaz6CQFf3YsecydxHzxK8Iv8clcLohGAtTaqttQaN8JznEDcGirqKp"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Смирнова</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">11.10.2023, 09:00</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1020</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Козлов Михаил А.</div>
+<div class="text-xs text-slate-500">+7 (933) 444-55-66</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Головная боль</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Острая головная боль и головокружение...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">В работе</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a male doctor in a white coat" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1lUBo_AS_-V_G6wAlP5FjBQzRBzFVrSvK34N30Xq_VQCF10b31Km8rHL1URj1fO7Szf4655zkqN4Rc8OuEiN6yECOFEcOP5mxWMREb2mkfhuI8sS0iQ2EC-tE4SCK2HyVoCth9Dvs_2qNiudaE6z1fs6zEVrRxRlb-SpXvwXqbe0OR1caV0ImEKREtmhpY8SZ8pJk7Meryhk1YHDJDzJH57KyNOAZR7bCOigN_sKbqrfCpXt2oOrqCcZ3B6htsJGEgrfm9VjzJ0-W"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Иванов</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">10.10.2023, 18:20</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1019</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Соколова Елена Н.</div>
+<div class="text-xs text-slate-500">+7 (944) 555-66-77</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Осмотр после операции</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Плановый осмотр после удаления аппендицита...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">Закрытый</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a smiling male medical professional" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2K_NJGjHV52JRn1imfbVwL5UqCU2Kd-2PPz8gMn-4AvmjsQ34_mLkTLlq9W8UIluTdheQ9srqUej2UpzIeYoSNkbCuOtpoArmD0MQxFmr5O4Ymr_NZWObZNDyv-YJvXj-_scgY1UgUj9ZVQ2Wsmfcpxh64bSkeFVfnM-ykt4AUCL6MR2NolBWCv5SYRa6-0H8NhrhxtWt7vQpjtf9U73M5d8ejPUcK52G6JraxDoWBEiPTDYsY9lgWDOxKsY-YGVkKuN09pMeVjU6"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Петров</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">10.10.2023, 10:10</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr>
+<td class="px-6 py-4 text-sm text-slate-500 font-medium">1018</td>
+<td class="px-6 py-4">
+<div class="text-sm font-bold text-slate-900 dark:text-white">Морозов Даниил В.</div>
+<div class="text-xs text-slate-500">+7 (955) 666-77-88</div>
+</td>
+<td class="px-6 py-4">
+<div class="text-sm text-slate-900 dark:text-slate-200">Справка в бассейн</div>
+<div class="text-xs text-slate-500 truncate max-w-[200px]">Запрос справки для посещения спорткомплекса...</div>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Новый</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex text-amber-400">
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px] filled-icon">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+<span class="material-symbols-outlined text-[18px]">star</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 overflow-hidden">
+<img alt="Doctor" class="w-full h-full object-cover" data-alt="Portrait of a female doctor with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD49D3zS0F2eZN23fhjzseHtV8Fb3YzH8svN_oOjN6e1uLVRBcKgzzBDaolcB-8YdxcXC0N2FRvGXOh3GMncOmcQ3Ip9SXXkRtdK_SxOuUDVsX7UbaOfGS-jAzcuCRBJWFa0m_F-5qkpx3FtzxXZetRDdp4sD9qWeRHSaqTuQ43Vb3e4ejad83xnMEdILu8XLdHbHUC3eJogdU20K2n02lTjcXHwrckuNHpWcbvKpgQDUrAOqpruvkHr9gEhdr_pHlwbH4tApXo-GLD"/>
+</div>
+<span class="text-sm text-slate-700 dark:text-slate-300">Д-р Смирнова</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">09.10.2023, 15:50</td>
+<td class="px-6 py-4 text-right">
+<div class="flex justify-end gap-2 text-slate-400">
+<button class="hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+<button class="hover:text-primary"><span class="material-symbols-outlined">edit</span></button>
+<button class="hover:text-green-600"><span class="material-symbols-outlined">check_circle</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<p class="text-sm text-slate-500">Показано <span class="font-bold text-slate-900 dark:text-white">1-7</span> из <span class="font-bold text-slate-900 dark:text-white">82</span> запросов</p>
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-colors disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-primary text-white text-sm font-bold shadow-md shadow-primary/20">1</button>
+<button class="w-8 h-8 rounded-lg text-slate-600 dark:text-slate-400 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">2</button>
+<button class="w-8 h-8 rounded-lg text-slate-600 dark:text-slate-400 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">3</button>
+<span class="text-slate-400 px-1">...</span>
+<button class="w-8 h-8 rounded-lg text-slate-600 dark:text-slate-400 text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">12</button>
+<button class="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:bg-white dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,1016 @@
+openapi: 3.1.0
+info:
+  title: MedQuest CRM API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      tags:
+      - Dashboard
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /auth/login:
+    post:
+      tags:
+      - Auth
+      summary: Login
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/refresh:
+    post:
+      tags:
+      - Auth
+      summary: Refresh Tokens
+      operationId: refresh_tokens_auth_refresh_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenPair'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/me:
+    get:
+      tags:
+      - Auth
+      summary: Me
+      operationId: me_auth_me_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+      security:
+      - HTTPBearer: []
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List Users
+      operationId: list_users_users_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+                type: array
+                title: Response List Users Users Get
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - Users
+      summary: Create User
+      operationId: create_user_users_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /users/{user_id}:
+    put:
+      tags:
+      - Users
+      summary: Update User
+      operationId: update_user_users__user_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Users
+      summary: Delete User
+      operationId: delete_user_users__user_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /patients:
+    get:
+      tags:
+      - Patients
+      summary: List Patients
+      operationId: list_patients_patients_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PatientResponse'
+                type: array
+                title: Response List Patients Patients Get
+      security:
+      - HTTPBearer: []
+    post:
+      tags:
+      - Patients
+      summary: Create Patient
+      operationId: create_patient_patients_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /patients/{patient_id}:
+    get:
+      tags:
+      - Patients
+      summary: Get Patient
+      operationId: get_patient_patients__patient_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Patient Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Patients
+      summary: Update Patient
+      operationId: update_patient_patients__patient_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Patient Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Patients
+      summary: Delete Patient
+      operationId: delete_patient_patients__patient_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: patient_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Patient Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /requests:
+    get:
+      tags:
+      - Requests
+      summary: List Requests
+      operationId: list_requests_requests_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      - name: assigned_doctor_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Assigned Doctor Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PatientRequestResponse'
+                title: Response List Requests Requests Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Requests
+      summary: Create Request
+      operationId: create_request_requests_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequestCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRequestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /requests/{request_id}:
+    get:
+      tags:
+      - Requests
+      summary: Get Request
+      operationId: get_request_requests__request_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Request Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRequestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      tags:
+      - Requests
+      summary: Update Request
+      operationId: update_request_requests__request_id__put
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Request Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequestUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRequestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - Requests
+      summary: Delete Request
+      operationId: delete_request_requests__request_id__delete
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Request Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /requests/{request_id}/status:
+    patch:
+      tags:
+      - Requests
+      summary: Change Request Status
+      operationId: change_request_status_requests__request_id__status_patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Request Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeStatusRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRequestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /requests/{request_id}/assign:
+    patch:
+      tags:
+      - Requests
+      summary: Assign Doctor
+      operationId: assign_doctor_requests__request_id__assign_patch
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: request_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Request Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignDoctorRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientRequestResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /dashboard/stats:
+    get:
+      tags:
+      - Dashboard
+      summary: Stats
+      operationId: stats_dashboard_stats_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardStats'
+      security:
+      - HTTPBearer: []
+  /audit/logs:
+    get:
+      tags:
+      - Audit
+      summary: List Audit Logs
+      operationId: list_audit_logs_audit_logs_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: User Id
+      - name: entity_type
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Entity Type
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AuditLogResponse'
+                title: Response List Audit Logs Audit Logs Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AssignDoctorRequest:
+      properties:
+        doctor_id:
+          type: integer
+          title: Doctor Id
+      type: object
+      required:
+      - doctor_id
+      title: AssignDoctorRequest
+    AuditLogResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        user_id:
+          type: integer
+          title: User Id
+        action:
+          type: string
+          title: Action
+        entity_type:
+          type: string
+          title: Entity Type
+        entity_id:
+          type: integer
+          title: Entity Id
+        details:
+          additionalProperties: true
+          type: object
+          title: Details
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+      type: object
+      required:
+      - id
+      - user_id
+      - action
+      - entity_type
+      - entity_id
+      - details
+      - timestamp
+      title: AuditLogResponse
+    ChangeStatusRequest:
+      properties:
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - status
+      title: ChangeStatusRequest
+    DashboardStats:
+      properties:
+        total_patients:
+          type: integer
+          title: Total Patients
+        total_requests:
+          type: integer
+          title: Total Requests
+        requests_new:
+          type: integer
+          title: Requests New
+        requests_in_progress:
+          type: integer
+          title: Requests In Progress
+        requests_closed:
+          type: integer
+          title: Requests Closed
+      type: object
+      required:
+      - total_patients
+      - total_requests
+      - requests_new
+      - requests_in_progress
+      - requests_closed
+      title: DashboardStats
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    LoginRequest:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - password
+      title: LoginRequest
+    PatientCreate:
+      properties:
+        full_name:
+          type: string
+          title: Full Name
+        birth_date:
+          type: string
+          format: date
+          title: Birth Date
+        phone:
+          type: string
+          title: Phone
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+        address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Address
+      type: object
+      required:
+      - full_name
+      - birth_date
+      - phone
+      title: PatientCreate
+    PatientRequestCreate:
+      properties:
+        patient_id:
+          type: integer
+          title: Patient Id
+        title:
+          type: string
+          title: Title
+        description:
+          type: string
+          title: Description
+        priority:
+          type: integer
+          maximum: 5.0
+          minimum: 1.0
+          title: Priority
+          default: 3
+      type: object
+      required:
+      - patient_id
+      - title
+      - description
+      title: PatientRequestCreate
+    PatientRequestResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        patient_id:
+          type: integer
+          title: Patient Id
+        title:
+          type: string
+          title: Title
+        description:
+          type: string
+          title: Description
+        status:
+          type: string
+          title: Status
+        priority:
+          type: integer
+          title: Priority
+        assigned_doctor_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Assigned Doctor Id
+        created_by_id:
+          type: integer
+          title: Created By Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - patient_id
+      - title
+      - description
+      - status
+      - priority
+      - assigned_doctor_id
+      - created_by_id
+      - created_at
+      - updated_at
+      title: PatientRequestResponse
+    PatientRequestUpdate:
+      properties:
+        title:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Title
+        description:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Description
+        status:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+        priority:
+          anyOf:
+          - type: integer
+            maximum: 5.0
+            minimum: 1.0
+          - type: 'null'
+          title: Priority
+        assigned_doctor_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Assigned Doctor Id
+      type: object
+      title: PatientRequestUpdate
+    PatientResponse:
+      properties:
+        full_name:
+          type: string
+          title: Full Name
+        birth_date:
+          type: string
+          format: date
+          title: Birth Date
+        phone:
+          type: string
+          title: Phone
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+        address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Address
+        id:
+          type: integer
+          title: Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        created_by_id:
+          type: integer
+          title: Created By Id
+      type: object
+      required:
+      - full_name
+      - birth_date
+      - phone
+      - id
+      - created_at
+      - created_by_id
+      title: PatientResponse
+    PatientUpdate:
+      properties:
+        full_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Full Name
+        birth_date:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Birth Date
+        phone:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Phone
+        email:
+          anyOf:
+          - type: string
+            format: email
+          - type: 'null'
+          title: Email
+        address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Address
+      type: object
+      title: PatientUpdate
+    RefreshRequest:
+      properties:
+        refresh_token:
+          type: string
+          title: Refresh Token
+      type: object
+      required:
+      - refresh_token
+      title: RefreshRequest
+    TokenPair:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        refresh_token:
+          type: string
+          title: Refresh Token
+        token_type:
+          type: string
+          title: Token Type
+          default: bearer
+      type: object
+      required:
+      - access_token
+      - refresh_token
+      title: TokenPair
+    UserCreate:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        full_name:
+          type: string
+          title: Full Name
+        role:
+          type: string
+          title: Role
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - email
+      - full_name
+      - role
+      - password
+      title: UserCreate
+    UserResponse:
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email
+        full_name:
+          type: string
+          title: Full Name
+        role:
+          type: string
+          title: Role
+        id:
+          type: integer
+          title: Id
+        is_active:
+          type: boolean
+          title: Is Active
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - email
+      - full_name
+      - role
+      - id
+      - is_active
+      - created_at
+      title: UserResponse
+    UserUpdate:
+      properties:
+        full_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Full Name
+        role:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+        is_active:
+          anyOf:
+          - type: boolean
+          - type: 'null'
+          title: Is Active
+      type: object
+      title: UserUpdate
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    HTTPBearer:
+      type: http
+      scheme: bearer

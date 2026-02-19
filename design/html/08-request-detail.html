@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedQuest CRM Request Detailed View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6324eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#161121",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-[240px] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="bg-primary rounded-lg p-1.5 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl">medical_services</span>
+</div>
+<div>
+<h1 class="text-sm font-bold leading-none tracking-tight">MedQuest CRM</h1>
+<p class="text-[10px] text-slate-500 uppercase tracking-wider mt-1 font-semibold">Админ-панель</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Дашборд</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">content_paste_search</span>
+<span class="text-sm font-semibold">Запросы</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-sm font-medium">Пациенты</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">stethoscope</span>
+<span class="text-sm font-medium">Врачи</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Настройки</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-2">
+<div class="size-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+<span class="text-xs font-bold text-slate-600 dark:text-slate-300">АД</span>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-xs font-bold truncate">Админ</p>
+<p class="text-[10px] text-slate-500 truncate">admin@medquest.ru</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+<!-- Header -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 h-16 flex items-center justify-between px-8 sticky top-0 z-10 shrink-0">
+<div class="flex items-center gap-4">
+<button class="size-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">arrow_back</span>
+</button>
+<nav class="flex items-center gap-2 text-sm">
+<a class="text-slate-500 hover:text-primary transition-colors" href="#">Запросы</a>
+<span class="material-symbols-outlined text-slate-400 text-sm">chevron_right</span>
+<span class="font-semibold text-slate-900 dark:text-slate-100">Запись на МРТ #42</span>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<div class="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+<span class="size-2 bg-orange-500 rounded-full animate-pulse"></span>
+                        В работе
+                    </div>
+<div class="bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1.5">
+<span class="material-symbols-outlined text-xs">flag</span>
+                        Приоритет: 4
+                    </div>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-2"></div>
+<button class="size-8 flex items-center justify-center hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+<span class="material-symbols-outlined text-slate-600 dark:text-slate-400">notifications</span>
+</button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-8 max-w-7xl mx-auto w-full">
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column -->
+<div class="col-span-8 space-y-6">
+<!-- Request Info Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+<div class="p-6">
+<div class="flex items-start justify-between mb-4">
+<div>
+<h2 class="text-xl font-bold text-slate-900 dark:text-slate-100">Запись на МРТ позвоночника</h2>
+<div class="mt-2 flex items-center gap-2">
+<span class="text-slate-500 text-sm">Пациент:</span>
+<a class="text-sm font-semibold text-primary hover:underline flex items-center gap-1" href="#">
+                                                Иванова Мария Петровна
+                                                <span class="material-symbols-outlined text-xs">open_in_new</span>
+</a>
+</div>
+</div>
+<span class="text-xs text-slate-400 font-medium uppercase tracking-wider">Создано 14.05.2024, 10:20</span>
+</div>
+<div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                                        Требуется обследование поясничного отдела в связи с жалобами на острые боли в течение недели. Пациент отмечает затруднения при ходьбе. Направление от невролога приложено к бумажной карте. Аллергия на контраст: нет. Вес: 65 кг.
+                                    </p>
+</div>
+</div>
+</div>
+<!-- Status Management Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+<h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2 uppercase tracking-wide">
+<span class="material-symbols-outlined text-primary text-xl">sync_alt</span>
+                                Смена статуса
+                            </h3>
+<div class="flex gap-2">
+<button class="flex-1 py-2 px-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    Новый
+                                </button>
+<button class="flex-1 py-2 px-4 rounded-lg bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-xs">check</span>
+                                    В работе
+                                </button>
+<button class="flex-1 py-2 px-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    Закрыть запрос
+                                </button>
+</div>
+</div>
+<!-- Change History Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+<h3 class="text-sm font-bold text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2 uppercase tracking-wide">
+<span class="material-symbols-outlined text-primary text-xl">history</span>
+                                История изменений
+                            </h3>
+<div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-slate-200 before:via-slate-200 before:to-transparent dark:before:from-slate-800 dark:before:via-slate-800">
+<!-- Timeline Item 1 -->
+<div class="relative flex items-start gap-6 group">
+<div class="absolute left-0 size-10 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full border-2 border-primary z-10">
+<span class="material-symbols-outlined text-primary text-lg">person_add</span>
+</div>
+<div class="pl-14">
+<time class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Сегодня, 11:45</time>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Назначен врач</p>
+<p class="text-xs text-slate-500 mt-0.5">Администратор: <span class="text-slate-700 dark:text-slate-300">Соколова А.</span></p>
+<div class="mt-2 text-xs py-1 px-2 bg-slate-50 dark:bg-slate-800 rounded inline-block text-slate-500">
+                                            Новый ответственный: Карпов Иван Алексеевич
+                                        </div>
+</div>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative flex items-start gap-6 group">
+<div class="absolute left-0 size-10 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full border-2 border-slate-200 dark:border-slate-800 z-10">
+<span class="material-symbols-outlined text-slate-400 text-lg">edit</span>
+</div>
+<div class="pl-14">
+<time class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Вчера, 16:30</time>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Статус изменен</p>
+<p class="text-xs text-slate-500 mt-0.5">Система: <span class="text-slate-700 dark:text-slate-300">Автоматический переход</span></p>
+<div class="mt-2 flex items-center gap-2">
+<span class="text-[10px] px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 rounded text-slate-400">Новый</span>
+<span class="material-symbols-outlined text-xs text-slate-300">trending_flat</span>
+<span class="text-[10px] px-1.5 py-0.5 bg-orange-100 dark:bg-orange-900/30 text-orange-600 rounded">В работе</span>
+</div>
+</div>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative flex items-start gap-6 group">
+<div class="absolute left-0 size-10 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full border-2 border-slate-200 dark:border-slate-800 z-10">
+<span class="material-symbols-outlined text-slate-400 text-lg">add_circle</span>
+</div>
+<div class="pl-14 pb-4">
+<time class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">14.05.2024, 10:20</time>
+<p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Запрос создан</p>
+<p class="text-xs text-slate-500 mt-0.5">Источник: <span class="text-slate-700 dark:text-slate-300">Онлайн-регистратура</span></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column -->
+<div class="col-span-4 space-y-6">
+<!-- Assigned Doctor Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+<h3 class="text-xs font-bold text-slate-400 mb-5 uppercase tracking-widest">Назначенный врач</h3>
+<div class="flex items-center gap-4 mb-6">
+<div class="size-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xl">
+                                    КИ
+                                </div>
+<div class="min-w-0">
+<p class="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">Карпов Иван Алексеевич</p>
+<p class="text-xs text-slate-500 mt-1">Рентгенолог, МРТ-диагност</p>
+</div>
+</div>
+<button class="w-full py-2.5 rounded-lg bg-primary/10 text-primary text-sm font-bold hover:bg-primary/20 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">cached</span>
+                                Сменить врача
+                            </button>
+</div>
+<!-- Details (Priority) Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+<h3 class="text-xs font-bold text-slate-400 mb-5 uppercase tracking-widest">Детали</h3>
+<div class="space-y-4">
+<div>
+<label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3 block">Установить приоритет</label>
+<div class="grid grid-cols-5 gap-2">
+<button class="h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-400 hover:border-primary/50 hover:text-primary transition-all">1</button>
+<button class="h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-400 hover:border-primary/50 hover:text-primary transition-all">2</button>
+<button class="h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-400 hover:border-primary/50 hover:text-primary transition-all">3</button>
+<button class="h-9 rounded-lg border-2 border-primary bg-primary/5 text-sm font-bold text-primary transition-all">4</button>
+<button class="h-9 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-bold text-slate-400 hover:border-primary/50 hover:text-primary transition-all">5</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Audit Log Card -->
+<div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+<h3 class="text-xs font-bold text-slate-400 mb-5 uppercase tracking-widest">Аудит запроса</h3>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-slate-400 text-lg mt-0.5">verified_user</span>
+<div class="min-w-0">
+<p class="text-[11px] text-slate-600 dark:text-slate-300 leading-tight">Валидация данных пройдена</p>
+<p class="text-[9px] text-slate-400 mt-1">14.05.2024 10:21</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-slate-400 text-lg mt-0.5">vpn_key</span>
+<div class="min-w-0">
+<p class="text-[11px] text-slate-600 dark:text-slate-300 leading-tight">Доступ открыт для отдела диагностики</p>
+<p class="text-[9px] text-slate-400 mt-1">14.05.2024 10:25</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-slate-400 text-lg mt-0.5">assignment_turned_in</span>
+<div class="min-w-0">
+<p class="text-[11px] text-slate-600 dark:text-slate-300 leading-tight">Системная проверка завершена успешно</p>
+<p class="text-[9px] text-slate-400 mt-1">14.05.2024 10:30</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-2 text-xs font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors border border-dashed border-slate-200 dark:border-slate-700 rounded-lg">
+                                Показать полный лог
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

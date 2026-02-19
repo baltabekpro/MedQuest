@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedQuest CRM - Журнал аудита</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["ui-monospace", "SFMono-Regular", "Menlo", "Monaco", "Consolas", "Liberation Mono", "Courier New", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-size: 22px; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+<div class="flex min-h-screen">
+<!-- Sidebar -->
+<aside class="w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col shrink-0">
+<div class="p-6 border-b border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg text-white">
+<span class="material-symbols-outlined block">medical_services</span>
+</div>
+<div>
+<h1 class="text-lg font-bold leading-none tracking-tight">MedQuest CRM</h1>
+<p class="text-[10px] text-slate-500 uppercase tracking-widest font-semibold mt-1">Система управления</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 p-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Панель управления</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Пациенты</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="text-sm font-medium">Запросы</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">manage_accounts</span>
+<span class="text-sm font-medium">Пользователи</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 bg-primary/10 text-primary rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">find_in_page</span>
+<span class="text-sm font-medium">Аудит</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Настройки</span>
+</a>
+</nav>
+<div class="p-4 border-t border-slate-200 dark:border-slate-800">
+<div class="flex items-center gap-3 px-3 py-2">
+<img alt="Avatar of current admin" class="w-8 h-8 rounded-full border border-slate-200" data-alt="Male doctor profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5H-Am2m6QbuPSl8ZHKTx8_rcDK6F1sq8herlggALJdIjRzFXosLn__3Otq6xKydE2sA5BK9n8cKg5kPhOkyHin9oIFZtW11vnQz5Q4hjH16l3MAEXcIEEmGlH14YbsXANrz8aouDbGMeT5yuep2SMAVkq_4ZSqtgqpyoxfqUNzvOYucLHHSlHy1cwVWvKr9S4B6-rN5ZHtrQ1k-0TH0dYOLFAF4nSqJk6hei8-LZMu8B13CCzzbrYLEPqJ-cUVt5TYYhNMn05m_3w"/>
+<div class="overflow-hidden">
+<p class="text-sm font-semibold truncate">Админ: Александр</p>
+<p class="text-xs text-slate-500 truncate">Super Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col min-w-0 overflow-hidden">
+<!-- Header -->
+<header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-8 py-6 flex items-center justify-between">
+<div>
+<h2 class="text-2xl font-black text-slate-900 dark:text-white leading-tight">Журнал аудита</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Все изменения в системе и действия пользователей</p>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white px-4 py-2.5 rounded-lg flex items-center gap-2 text-sm font-bold shadow-sm transition-all">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                    Экспорт CSV
+                </button>
+</header>
+<!-- Filters -->
+<section class="p-8 bg-slate-50 dark:bg-slate-900/50">
+<div class="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Период</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">calendar_today</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" type="text" value="20 Окт, 2023 - 27 Окт, 2023"/>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Пользователь</label>
+<select class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+<option>Все пользователи</option>
+<option>Др. Хаус</option>
+<option>Админ Сара</option>
+<option>Регистратор Анна</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Действие</label>
+<select class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+<option>Все действия</option>
+<option>CREATE</option>
+<option>UPDATE</option>
+<option>DELETE</option>
+<option>LOGIN</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Сущность</label>
+<select class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary">
+<option>Все сущности</option>
+<option>Patient</option>
+<option>Request</option>
+<option>User</option>
+</select>
+</div>
+<div class="space-y-1.5">
+<label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Поиск по описанию</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-primary focus:border-primary" placeholder="Введите текст..." type="text"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Table Container -->
+<section class="flex-1 px-8 pb-8 overflow-y-auto">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">ID</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Дата и время</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Пользователь</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Действие</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Сущность</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Описание</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">IP-адрес</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1032</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 14:55:22</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Female doctor avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwo8A05SbmQwoRJqx6yzrDfWVCkFrQ6d_q46ohwthkd-JVOJ9ygy6D0N95T9w3i7YM1Wow7Hc_xgHPJPNGWfsgVmYXkojOMbtqvWPYqmqJho00vEEsRfqgcSKyTIpDH54SIr8NJFDKLBP6nGEwyJTkbtkSKWzkPBYLbALhR3tmou8dlOEsH9SP7RE6bQ3rrXmSTnPu4DcNqNy0Meaw_1wRsPqFuaxLyhhPjtSSoYul2FRZWPFwY2CXpIahQlur1NE49v6i3jWw5LBC"/>
+<span class="text-sm font-semibold">Админ Сара</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide">UPDATE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Request</td>
+<td class="px-6 py-4 text-sm font-medium">Изменён статус запроса #42 на "Завершено"</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">192.168.1.45</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1031</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 14:20:05</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Male physician avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCMgNXi-snls3wmQ2pm6OPpR1vsWyXP5Q4MEYNUbCCJ86CoiD0gTpQxRf4zHo-EoxLXatamUCPfY9Be-EGyForucLBpLwEXdvNq-U-T2POzvBG-_nHMLH0Fcj4gOLU2OaMEyseqrGgImuEL8msqCClZaIaH3imrCpC8NRdq9XF9_PurqqKpYgvwTrW1oVh6flZHKAOEzV1PHv5JEvUdttTAuXrHpWQmMtzlruYmnKFitLTBLllxoV4jvghTPB-OV33qF33oA9eFS5X8"/>
+<span class="text-sm font-semibold">Др. Хаус</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wide">CREATE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Patient</td>
+<td class="px-6 py-4 text-sm font-medium">Создан новый пациент: Иванова М.П.</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">172.16.0.12</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1030</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 13:45:10</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Support staff profile image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFocjPeY9de96lCZVHOWrcxg5HBRmMiszqrqNN0Qe_fvizWFqhhawDu0fj3YTiLZYfRaiMbIPEA31aIKTK91EwdQ1_L12JtQUt9NRjgg_1UnGAhFoSestr3L2r_IoiW_6-aVjH3e6PZ_b1O2VAPC0cSDZ8N9a5R9XxCC3_mnzbqbjWrhfgzoHi-O5Ns36E8hlpgiwdy-x1rQmQ2FbuCWnWzhlntW36qhqtrWf0Wob4ZjjC9K3h4hlThTKXuUK8Rj81ODe_vRq-txWZ"/>
+<span class="text-sm font-semibold">Система</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wide">LOGIN</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Auth</td>
+<td class="px-6 py-4 text-sm font-medium">Успешный вход в систему (Admin Sarah)</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">192.168.1.45</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1029</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 12:15:33</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Administrator user photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC7axhbPfmO28MNnHT9hDA0dmy5lw-s4AJIb2A8rz2w1XOf6yb7kvhSEoNMQ0XNmg9uxI5uZoi6Artogld4G3fkLulztmAPLi-E0XUCjl_gyX0TK4tLV1PtD8UMeTum0YizMZZq2yZ4SVqrS2qzlHFE4YkAd1FRDTQRaxp74dPdX3OqFyyLWQhr_rXfba54WCMchcSyepbiF3kLYGlirAYHCiHHFjXX0Q3HJ5_qoRzg0ujoOdjFaXsYgzZKAp6oD7H2_tROLrQiCf7"/>
+<span class="text-sm font-semibold">Админ Сара</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-[10px] font-bold uppercase tracking-wide">DELETE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Patient</td>
+<td class="px-6 py-4 text-sm font-medium">Удалена архивная запись #8821 (Сидоров В.К.)</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">192.168.1.45</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1028</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 11:30:12</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Staff member profile circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7g3Eg-PfSfXNkayzQo86CNCo6mNJs68DV_Bk2Ys4poN3beg56CA3O6PHu5tUD5itpLVErAkLlA82Ng6foultiUf23Nfn4TPS3jANWIWw2cvFFY6jV2AvPESdr-8DZdrFbNOfnnVWsn67E9qpv_W8qzBKqgmMU5VtVWPYvWYsXRYMbl8EwI_5ATi8IQjfZkK8VBDmKtpD651-AK6DN6ScWftiV6yw_DG_EpzCN-FACah7GGURV7Hfc1W4xHiQFNK2ySMAwsvKtuUsL"/>
+<span class="text-sm font-semibold">Анна Р.</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide">UPDATE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">User</td>
+<td class="px-6 py-4 text-sm font-medium">Обновлены права доступа для медсестры Петровой</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">10.0.4.152</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1027</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 10:05:44</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Female medical professional avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6yGCm8Wb8TU288usno7r8ooBAnHZyF4L2_tYnTJPXWR_veGhM8xHsKHDcfHJZvwWHvcrS-_wb7rLNMCLe-953J4gU_DePJ966Zdl2hp5kIGq5iiIDfQiFcyawY0qXiuszwsZ39RJ6cG8q9Lkg97KEJvepI2AN2fQ9hIld_LCMeMsaBZiJcqtXEF1pzFL9M96XkpJnLrfCsU0yLegFvifyGqVJUv_XhnxiXPBbPdzmrJfoD_G-CD0BndzdZvW_JPTlLrBHhcvtUG11"/>
+<span class="text-sm font-semibold">Др. Смирнова</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-[10px] font-bold uppercase tracking-wide">CREATE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Request</td>
+<td class="px-6 py-4 text-sm font-medium">Добавлена запись о приёме #552 (Кардиология)</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">192.168.5.11</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1026</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 09:22:18</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="System process icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOjBoE-nguYk8G-sctPZymtEpVvoyDTp5sh4xCPugi-6RWblUe5Jlq2vlD4s1RGaZR6Er3Y_rWxkdAzPJgvYAl7EdWwFDrlp-ua73FZ9OBPtkehbQmpX6E566HQINaEMJwG0nEf1L1FOGYGYNc1vOML3CcwwJ9Io7hIFX9TLVmHkAEodvNPVPL2Eut0SuHcxCHdRp99Pj6Z9CZ3D-4-xOMht7XP801e4wZuzktGKY6ICm114zOnspdh0cX75kz2JhbUSc-DTCBC5vZ"/>
+<span class="text-sm font-semibold">Система</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wide">UPDATE</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">System</td>
+<td class="px-6 py-4 text-sm font-medium">Автоматическое резервное копирование базы данных</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">::1</td>
+</tr>
+<!-- Row 8 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500">1025</td>
+<td class="px-6 py-4 text-sm font-bold font-mono text-slate-700 dark:text-slate-300">2023-10-27 08:45:00</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<img alt="User avatar" class="w-7 h-7 rounded-full" data-alt="Physician login profile" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5Ew0b1Ai7hK7TOBBy9_llRdSoE-W_SeRHLmvPBWbrszQqZ6Yrg9Ja2QWYIgdACAW10uyh0HZG5tf7Iw9FH2r4PtenrYsEN0u5ddsAiqFiWzCm6_SedxCa0_JygmxJA0-F3eXbjZi02serfUE6Lvwxq5hO49VQ4JB7enaas-Jzxe_mfkBjaGHP_BgDeNiUraIJ2vHzXvdZkGZWDXqI9-DsLLzJ_2WwwV_vz2fpG2GrNf1PBxvpvCjslCbF9RO--OgEB0BLSY7gUnmc"/>
+<span class="text-sm font-semibold">Др. Хаус</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wide">LOGIN</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Auth</td>
+<td class="px-6 py-4 text-sm font-medium">Успешный вход в систему (Dr. House)</td>
+<td class="px-6 py-4 text-sm font-mono text-slate-500">172.16.0.12</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between">
+<p class="text-sm text-slate-500 italic">Показано 8 из 2450 записей</p>
+<div class="flex items-center gap-2">
+<button class="p-1.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 text-slate-400 disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[18px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 rounded bg-primary text-white text-sm font-bold">1</button>
+<button class="px-3 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">2</button>
+<button class="px-3 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">3</button>
+<span class="text-slate-400">...</span>
+<button class="px-3 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">123</button>
+<button class="p-1.5 rounded border border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

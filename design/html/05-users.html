@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MedQuest CRM Staff Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2463eb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                        "role-admin": "#7c3aed",
+                        "role-registrar": "#2463eb",
+                        "role-doctor": "#0d9488",
+                        "status-active": "#10b981",
+                        "status-inactive": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .active-nav-item {
+            background-color: #e7ebf3;
+            border-right: 3px solid #2463eb;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 bg-white dark:bg-background-dark border-r border-slate-200 dark:border-slate-800 flex flex-col">
+<div class="p-6 flex items-center gap-3">
+<div class="size-10 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">health_metrics</span>
+</div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-none">MedQuest CRM</h1>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-1">Панель управления</p>
+</div>
+</div>
+<nav class="flex-1 px-4 mt-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">dashboard</span>
+<span class="text-sm font-medium">Дашборд</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">groups</span>
+<span class="text-sm font-medium">Пациенты</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">calendar_today</span>
+<span class="text-sm font-medium">Приемы</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-primary bg-primary/10 rounded-lg transition-colors border-r-2 border-primary" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-bold">Пользователи</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors" href="#">
+<span class="material-symbols-outlined text-xl">settings</span>
+<span class="text-sm font-medium">Настройки</span>
+</a>
+</nav>
+<div class="p-4 mt-auto border-t border-slate-200 dark:border-slate-800">
+<button class="flex items-center gap-3 w-full px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-xl text-slate-400">logout</span>
+<span class="text-sm font-medium">Выйти</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-hidden">
+<!-- Header -->
+<header class="h-20 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-8 flex items-center justify-between flex-shrink-0">
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white">Пользователи</h2>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-lg font-bold text-sm transition-all shadow-sm shadow-primary/20">
+<span class="material-symbols-outlined text-lg leading-none">add</span>
+                        Добавить пользователя
+                    </button>
+<div class="size-10 rounded-full border-2 border-slate-100 dark:border-slate-800 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Admin profile picture professional headshot" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC97clVH3W44Rh9uv6xf7pFpdOC8DTjW85xU_8VsIDGSNp1SjlVS34-g2y49M92WEUVTRu7R9bMUSF_wXEMHpna0RQxkk2fDST29KLKg4eQsgZtNFKOXPPKmkvyLy76xfBqvELt0G0BU0L_h1Ajlgba1zT9-LU3XUchzoas3fHWUow6JGW6_givzBYPtAHj9RIVRo_JMAcOHHlzMO8uTyLf8vRpC8BmRqmS1dHaEfSIJ26KknKmJigKzLiMRS0UPbUlHYuuGYAMNGj"/>
+</div>
+</div>
+</header>
+<!-- Table Controls & Filters -->
+<div class="p-8 pb-0 overflow-y-auto">
+<div class="flex flex-col gap-6">
+<!-- Search and Secondary Actions -->
+<div class="flex items-center justify-between gap-4">
+<div class="relative flex-1 max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+<input class="w-full bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-primary focus:border-primary transition-all" placeholder="Поиск по имени или email" type="text"/>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-slate-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 text-slate-500 hover:bg-white dark:hover:bg-slate-800 rounded-lg border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+</div>
+<!-- Filter Tabs -->
+<div class="flex border-b border-slate-200 dark:border-slate-800">
+<button class="px-6 py-3 text-sm font-bold border-b-2 border-primary text-primary">Все (20)</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Администраторы (3)</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Регистраторы (8)</button>
+<button class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">Врачи (9)</button>
+</div>
+</div>
+</div>
+<!-- Table Container -->
+<div class="flex-1 p-8 overflow-y-auto">
+<div class="bg-white dark:bg-background-dark border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm">
+<table class="w-full text-left border-collapse">
+<thead class="bg-slate-50 dark:bg-slate-800/50">
+<tr>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider w-16 text-center">ID</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Пользователь</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Email</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Роль</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-center">Статус</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Дата создания</th>
+<th class="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right">Действия</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">101</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Anna Sergeeva registrar staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdAE0x2GEVjDyw7P_9IOfXETrD1GXQ69gkyimBwsFnE2NDjLncLHR_mrxfghOn2XWSfL_MIIaFvvHwqsbGSHJznJ9JccaFyGiGyO1bfVKRZcV9f4QnRAaWGb3ynQ6dHuY7KF0tK798TGvHn3OdeDi7dpAO3aMVk5BVz4lMk9ZxScBx-lAj043KwOrJkNp0iafL3MnZBF6crehROvXVPAUUcaLmyQjcufsxe-ofBLGK_ROAjhIXh83AdjLyu1_OPBLWsHmaxV4tqtqv"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Сергеева Анна</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">sergeeva@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-primary/10 text-primary uppercase">Регистратор</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        Активен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">12.05.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">102</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Alexey Petrov doctor staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcL88X8usegV309Iue-bXk6NauIwtd0Z3WsdhAtLoW_oKL_IlvfpXHQcPvbN5A9tnK3l2MzpRwdExO4qsqOjmvdHJtNV_M9qH25Frr4utmLETufAECfOn_os18d7WPYcOeDwIOGLxAdZd00veYxQ6k8v3SY-vxrMWg8DR4fxKrQyBMJ4fcUeTD0_rGK6vmEzD6-qLgrn-RDGwwQBT6BKCUfxIRVpb6Z7br5sdK0O4hT_am1qGIJpn9ragG6oWqQMRADctCxfvMkOmp"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Петров Алексей</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">petrov@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-100 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 uppercase">Врач</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        Активен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">15.05.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">103</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Ivan Ivanov admin staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWnMzZJP-hnnektgQy7E8lkY0hqjUOWikr0tpw1tC0rmTeNDPaE-FV4RwHu6NTBFYUlBzPeFBH9xQF_LoX_WglcoT8iTgE0dnRx86fzDLSg6RBqaD7OhxJTAWFQAFiuLFAOjdZDRFa42zZ3JPbsVJ2WyNC48g4EF0Ev1vZl64rW-SFJThPACHBqtuJImH4PeyzT9BmD1atPnhVkghm8PrQFS0_npt4lJ1cmz5wGdUevAQO3RBtGAwfVyWYCdDoutj92XuYTozBXfQ9"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Иванов Иван</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">ivanov@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-role-admin/10 text-role-admin uppercase">Администратор</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+<span class="size-1.5 rounded-full bg-slate-400"></span>
+                                        Неактивен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">20.01.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-900 dark:text-white transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">104</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Elena Smirnova doctor staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKCvM8l0jxOfyVHxZAwcxNWXpyoe_7lccyPvqoMSpmdR5VqPJF98FfMRRiHERySz7jYa13gVeM_fYPd0o3umMTfUvwhc7WPDUn9bIsib7lazzPyyVejA-TpiTHwmiV6jo6m1YLDAA4ZtX_7QH8lSeOwzjpIGE6RT7ZW0OPx_X0Vg5Qcfjy7uTA9BupSz9HDlydLY7hOY3Vfl8poASiRQ12qQnE0u3L0xfHiXx-0RSV5isOmP6hoAqincpL931Uc_PWfqFGdDGWHMf_"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Смирнова Елена</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">smirnova@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-100 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 uppercase">Врач</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        Активен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">03.06.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">105</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Igor Kuznetsov registrar staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnuVqnNbOJYy7zO55_7ThqOUR1jLT7Iquf3TzCtbg_oZFG6PY2lKGattvouZRA6-I_e9Hu5HfhBYjojcdx65zwN09cMFhO9_d_ErgOzY6aDWvhQKAFhKi3g0Jnqt3cfCEEiduccV2sjIN37Oq1Jlw5rFjKkrRerqhIhTS-PuzBXp1D-oESDv3rW48UZ_n9pntgZzdD9QgjO0cY_e8JxCQtrtD-H9YEfINdxYF6Vw7lWDHrHn9j06MCGUlCp31FA5ER--yo9O-SzjFQ"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Кузнецов Игорь</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">kuznetsov@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-primary/10 text-primary uppercase">Регистратор</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        Активен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">11.07.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">106</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Olga Popova doctor staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuABTlbHf-6ggmW3Ykclfvf0JLhFLi2_9buvjPgvC-4CL8YzrDygYUVtuNnzgWyLJeifwGatCtJoDCs4d8kQw5UPFJllgkkrJLwFP8M3gR05_-SuvyGpm3SnP4ru_oyy7hUzpg5I_r15bl0ffht3KXHo-OjYrxACP5kI8MQmb68BTvE_L5o9IXpGHa5_DGDnwq3RIowwULoGQeaZTHyfS-TcflYFXKmfJThvqhE6euID8uIzjrtZKomclWDEmH6MN_gsz6rDrC4wTSDz"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Попова Ольга</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">popova@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-teal-100 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 uppercase">Врач</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        Активен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">22.08.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 text-center font-medium">107</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary/10 flex-shrink-0">
+<img class="w-full h-full rounded-full object-cover" data-alt="Portrait of Dmitry Vasiliev registrar staff member" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCy-vw6erstcNFRI_cTNZ1jNjGzUV9GWT1E4egKhosj5W9g7pYmRyTytaZW6IOvKGyHuAS103UT0zG05zYAJHyRl83hGrVXzcbfTqMr8k1kW_mjWR_0t24YsIf4MFapZiQaJybVbLApUtmtTjhi-tcExuOcLbo36Nd0LkhmUm3sf1SqLqtYFM2BDwlCtsX2WIv1K04IaySZlnsMUHGlnqPJIZPgRdK2_wbLVRAgNuYltQhlIVL5i-fdJwZJx84osJNsDLezw7MLlDkT"/>
+</div>
+<div class="text-sm font-bold text-slate-900 dark:text-white">Васильев Дмитрий</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">vasiliev@medquest.ru</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-primary/10 text-primary uppercase">Регистратор</span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+<span class="size-1.5 rounded-full bg-slate-400"></span>
+                                        Неактивен
+                                    </span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">05.09.2023</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="p-1.5 text-slate-400 hover:text-primary transition-colors"><span class="material-symbols-outlined text-lg leading-none">edit</span></button>
+<button class="p-1.5 text-slate-900 dark:text-white transition-colors"><span class="material-symbols-outlined text-lg leading-none">power_settings_new</span></button>
+<button class="p-1.5 text-slate-400 hover:text-rose-500 transition-colors"><span class="material-symbols-outlined text-lg leading-none">delete</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 flex items-center justify-between border-t border-slate-100 dark:border-slate-800">
+<p class="text-xs text-slate-500 dark:text-slate-400">Показано 7 из 20 пользователей</p>
+<div class="flex items-center gap-2">
+<button class="p-1 text-slate-400 hover:text-primary disabled:opacity-50" disabled=""><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="size-7 flex items-center justify-center text-xs font-bold bg-primary text-white rounded">1</button>
+<button class="size-7 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">2</button>
+<button class="size-7 flex items-center justify-center text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded">3</button>
+<button class="p-1 text-slate-400 hover:text-primary"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
