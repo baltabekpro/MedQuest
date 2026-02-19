@@ -1,21 +1,14 @@
 import { useNavigate } from 'react-router-dom'
-import { Bar, BarChart, ResponsiveContainer, XAxis } from 'recharts'
-import { useDashboard } from '@/hooks/useDashboard'
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useDashboard, useDashboardWeeklyActivity } from '@/hooks/useDashboard'
 import { useRequests } from '@/hooks/useRequests'
 import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { statusLabel } from '@/utils/statusLabel'
-
-const data = [
-  { day: 'Пн', value: 6 },
-  { day: 'Вт', value: 4 },
-  { day: 'Ср', value: 7 },
-  { day: 'Чт', value: 5 },
-  { day: 'Пт', value: 8 },
-  { day: 'Сб', value: 2 },
-  { day: 'Вс', value: 3 },
-]
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { useAuthStore } from '@/store/authStore'
 
 const statusClass: Record<string, string> = {
   new: 'bg-green-100 text-green-800',
@@ -25,9 +18,18 @@ const statusClass: Record<string, string> = {
 
 export const DashboardPage = () => {
   const navigate = useNavigate()
+  const { user } = useAuthStore()
   const statsQuery = useDashboard()
-  const requestsQuery = useRequests({ limit: 5, page: 1 })
+  const [days, setDays] = useState<7 | 14 | 30>(7)
+  const activityQuery = useDashboardWeeklyActivity(days)
+  const requestsQuery = useRequests({
+    limit: 5,
+    page: 1,
+    assigned_doctor_id: user?.role === 'doctor' ? user.id : undefined,
+  })
   const stats = statsQuery.data
+  const activity = activityQuery.data?.points ?? []
+  const activityTotal = activity.reduce((sum, p) => sum + p.value, 0)
 
   return (
     <div className='grid gap-4 lg:grid-cols-[1fr_320px]'>
@@ -39,7 +41,9 @@ export const DashboardPage = () => {
           <Card>Закрыто сегодня: <b>{stats?.requests_closed_today ?? stats?.requests_closed ?? 0}</b></Card>
         </div>
         <Card>
-          <h2 className='mb-3 text-lg font-semibold'>Последние запросы</h2>
+          <h2 className='mb-3 text-lg font-semibold'>
+            {user?.role === 'doctor' ? 'Мои последние запросы' : 'Последние запросы'}
+          </h2>
           <Table>
             <TableHeader>
               <TableRow>
@@ -59,16 +63,74 @@ export const DashboardPage = () => {
             </TableBody>
           </Table>
         </Card>
+
+        <Card>
+          <h2 className='mb-3 text-lg font-semibold'>Быстрые действия</h2>
+          <div className='grid gap-2 sm:grid-cols-2'>
+            {(user?.role === 'admin' || user?.role === 'registrar') && (
+              <Button variant='outline' onClick={() => navigate('/patients')}>Добавить/изменить пациента</Button>
+            )}
+            {(user?.role === 'admin' || user?.role === 'registrar' || user?.role === 'doctor') && (
+              <Button variant='outline' onClick={() => navigate('/requests')}>Работа с запросами</Button>
+            )}
+            {user?.role === 'doctor' && (
+              <Button variant='outline' onClick={() => navigate('/requests?mode=all')}>Все запросы</Button>
+            )}
+            {user?.role === 'doctor' && (
+              <Button variant='outline' onClick={() => navigate('/requests?status=in_progress')}>Открыть запросы в работе</Button>
+            )}
+            {user?.role === 'doctor' && (
+              <Button variant='outline' onClick={() => navigate('/requests?mode=history')}>История моих запросов</Button>
+            )}
+            {user?.role === 'admin' && (
+              <Button variant='outline' onClick={() => navigate('/users')}>Управление пользователями</Button>
+            )}
+            {user?.role === 'admin' && (
+              <Button variant='outline' onClick={() => navigate('/audit')}>Просмотр журнала аудита</Button>
+            )}
+            <Button variant='outline' onClick={() => navigate('/profile')}>Мой профиль</Button>
+          </div>
+        </Card>
       </div>
       <Card>
-        <h2 className='mb-3 text-lg font-semibold'>Активность за неделю</h2>
+        <div className='mb-3 flex items-baseline justify-between gap-2'>
+          <h2 className='text-lg font-semibold'>Активность за неделю</h2>
+          <span className='text-sm text-muted'>Всего: <b>{activityTotal}</b></span>
+        </div>
+        <div className='mb-3 flex gap-2'>
+          {[7, 14, 30].map((d) => (
+            <button
+              key={d}
+              type='button'
+              className={`rounded-md border border-border px-3 py-1 text-sm ${days === d ? 'bg-blue-100 text-primary' : 'bg-white text-muted hover:bg-slate-50'}`}
+              onClick={() => setDays(d as 7 | 14 | 30)}
+            >
+              {d} дней
+            </button>
+          ))}
+        </div>
         <div className='h-64'>
-          <ResponsiveContainer>
-            <BarChart data={data}>
-              <XAxis dataKey='day' />
-              <Bar dataKey='value' fill='#2563EB' radius={6} />
-            </BarChart>
-          </ResponsiveContainer>
+          {activity.length ? (
+            <ResponsiveContainer>
+              <BarChart data={activity} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray='3 3' vertical={false} />
+                <XAxis dataKey='day' tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={24} />
+                <Tooltip
+                  cursor={{ fill: 'rgba(37, 99, 235, 0.08)' }}
+                  contentStyle={{ borderRadius: 12, borderColor: '#E2E8F0' }}
+                  labelFormatter={(_, payload) => {
+                    const p = payload?.[0]?.payload as { date?: string; day?: string } | undefined
+                    return p?.date ? `${p.day} · ${p.date}` : ''
+                  }}
+                  formatter={(v) => [v, 'Событий']}
+                />
+                <Bar dataKey='value' fill='#2563EB' radius={[8, 8, 0, 0]} maxBarSize={28} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className='grid h-full place-items-center text-sm text-muted'>Данных пока нет</div>
+          )}
         </div>
       </Card>
     </div>

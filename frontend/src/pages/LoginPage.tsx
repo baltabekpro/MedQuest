@@ -7,6 +7,12 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/errorMessage'
 
+const demoAccounts = [
+  { label: 'Администратор', email: 'admin@medquest.kz', password: 'admin123' },
+  { label: 'Регистратор', email: 'registrar@medquest.kz', password: 'registrar123' },
+  { label: 'Врач', email: 'doctor@medquest.kz', password: 'doctor123' },
+]
+
 export const LoginPage = () => {
   const navigate = useNavigate()
   const { accessToken, setTokens, setUser } = useAuthStore()
@@ -43,6 +49,26 @@ export const LoginPage = () => {
         <form className='w-full max-w-md space-y-4 rounded-lg border border-border bg-white p-8 shadow-sm' onSubmit={submit}>
           <h2 className='text-2xl font-semibold'>Вход в систему</h2>
           {error && <div className='rounded-md bg-red-100 p-3 text-sm text-red-700'>{error}</div>}
+
+          <div className='rounded-md border border-border bg-slate-50 p-3'>
+            <p className='mb-2 text-xs font-medium text-muted'>Демо-аккаунты (для защиты):</p>
+            <div className='grid grid-cols-1 gap-2 sm:grid-cols-3'>
+              {demoAccounts.map((account) => (
+                <button
+                  key={account.email}
+                  type='button'
+                  className='rounded-md border border-border bg-white px-2 py-1.5 text-xs hover:bg-slate-100'
+                  onClick={() => {
+                    setEmail(account.email)
+                    setPassword(account.password)
+                  }}
+                >
+                  {account.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <Input type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Email' />
           <div className='relative'>
             <Input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Пароль' />

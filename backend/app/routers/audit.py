@@ -20,6 +20,7 @@ def list_audit_logs(
     limit: int = Query(20, ge=1, le=100),
     user_id: int | None = Query(default=None),
     entity_type: str | None = Query(default=None),
+    entity_id: int | None = Query(default=None),
     action: str | None = Query(default=None),
     date_from: datetime | None = Query(default=None),
     date_to: datetime | None = Query(default=None),
@@ -32,6 +33,8 @@ def list_audit_logs(
         query = query.filter(AuditLog.user_id == user_id)
     if entity_type is not None:
         query = query.filter(AuditLog.entity_type == entity_type)
+    if entity_id is not None:
+        query = query.filter(AuditLog.entity_id == entity_id)
     if action is not None:
         query = query.filter(AuditLog.action == action)
     if date_from is not None:

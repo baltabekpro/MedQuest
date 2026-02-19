@@ -37,6 +37,15 @@ export interface PatientRequestResponse {
   updated_at: string
 }
 
+export interface RequestCommentResponse {
+  id: number
+  request_id: number
+  author_id: number
+  author_full_name: string
+  content: string
+  created_at: string
+}
+
 export interface DashboardStats {
   total_patients: number
   total_requests: number
@@ -44,6 +53,17 @@ export interface DashboardStats {
   requests_in_progress: number
   requests_closed: number
   requests_closed_today?: number
+}
+
+export interface DashboardActivityPoint {
+  date: string // YYYY-MM-DD
+  day: string
+  value: number
+}
+
+export interface DashboardWeeklyActivity {
+  days: number
+  points: DashboardActivityPoint[]
 }
 
 export interface AuditLogResponse {

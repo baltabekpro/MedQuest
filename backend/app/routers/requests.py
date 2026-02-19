@@ -6,14 +6,19 @@ from sqlalchemy.orm import Session, aliased
 
 from app.core.deps import get_current_user, require_roles
 from app.database import get_db
+from app.models.audit_log import AuditLog
 from app.models.patient import Patient
 from app.models.patient_request import PatientRequest
+from app.models.request_comment import RequestComment
 from app.models.user import User
+from app.schemas.audit import AuditLogResponse
 from app.schemas.common import PaginatedResponse
 from app.schemas.patient_request import (
     AssignDoctorRequest,
     ChangeStatusRequest,
     PatientRequestCreate,
+    RequestCommentCreate,
+    RequestCommentResponse,
     PatientRequestResponse,
     PatientRequestUpdate,
 )
@@ -142,12 +147,26 @@ def create_request(
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
 
+    assigned_doctor_full_name: str | None = None
+    if payload.assigned_doctor_id is not None:
+        doctor = (
+            db.query(User)
+            .filter(User.id == payload.assigned_doctor_id)
+            .filter(User.role == "doctor")
+            .filter(User.is_active == True)  # noqa: E712
+            .first()
+        )
+        if not doctor:
+            raise HTTPException(status_code=400, detail="Assigned doctor not found or inactive")
+        assigned_doctor_full_name = doctor.full_name
+
     request_obj = PatientRequest(
         patient_id=payload.patient_id,
         title=payload.title,
         description=payload.description,
         priority=payload.priority,
         status="new",
+        assigned_doctor_id=payload.assigned_doctor_id,
         created_by_id=current_user.id,
     )
     db.add(request_obj)
@@ -162,7 +181,12 @@ def create_request(
         entity_type="PatientRequest",
         entity_id=request_obj.id,
         ip_address=request.client.host if request and request.client else None,
-        details={"title": request_obj.title, "status": request_obj.status},
+        details={
+            "title": request_obj.title,
+            "status": request_obj.status,
+            "priority": request_obj.priority,
+            "assigned_doctor_id": request_obj.assigned_doctor_id,
+        },
     )
 
     return PatientRequestResponse(
@@ -174,7 +198,7 @@ def create_request(
         status=request_obj.status,
         priority=request_obj.priority,
         assigned_doctor_id=request_obj.assigned_doctor_id,
-        assigned_doctor_full_name=None,
+        assigned_doctor_full_name=assigned_doctor_full_name,
         created_by_id=request_obj.created_by_id,
         created_at=request_obj.created_at,
         updated_at=request_obj.updated_at,
@@ -202,6 +226,105 @@ def get_request(
     if not row:
         raise HTTPException(status_code=404, detail="Request not found")
     return _serialize_request_row(row)
+
+
+@router.get("/{request_id}/history", response_model=PaginatedResponse[AuditLogResponse])
+def list_request_history(
+    request_id: int,
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    request_exists = db.query(PatientRequest.id).filter(PatientRequest.id == request_id).first()
+    if not request_exists:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    query = (
+        db.query(AuditLog)
+        .filter(AuditLog.entity_type == "PatientRequest")
+        .filter(AuditLog.entity_id == request_id)
+    )
+    total = query.count()
+    items = query.order_by(AuditLog.id.desc()).offset((page - 1) * limit).limit(limit).all()
+    return PaginatedResponse(items=items, total=total, page=page, limit=limit)
+
+
+@router.get("/{request_id}/comments", response_model=list[RequestCommentResponse])
+def list_request_comments(
+    request_id: int,
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    request_exists = db.query(PatientRequest.id).filter(PatientRequest.id == request_id).first()
+    if not request_exists:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    rows = (
+        db.query(RequestComment, User.full_name.label("author_full_name"))
+        .join(User, User.id == RequestComment.author_id)
+        .filter(RequestComment.request_id == request_id)
+        .order_by(RequestComment.created_at.asc(), RequestComment.id.asc())
+        .all()
+    )
+
+    return [
+        RequestCommentResponse(
+            id=comment.id,
+            request_id=comment.request_id,
+            author_id=comment.author_id,
+            author_full_name=author_full_name,
+            content=comment.content,
+            created_at=comment.created_at,
+        )
+        for comment, author_full_name in rows
+    ]
+
+
+@router.post("/{request_id}/comments", response_model=RequestCommentResponse, status_code=status.HTTP_201_CREATED)
+def create_request_comment(
+    request_id: int,
+    payload: RequestCommentCreate,
+    request: Request,
+    current_user: User = Depends(require_roles("admin", "registrar", "doctor")),
+    db: Session = Depends(get_db),
+):
+    request_exists = db.query(PatientRequest.id).filter(PatientRequest.id == request_id).first()
+    if not request_exists:
+        raise HTTPException(status_code=404, detail="Request not found")
+
+    content = payload.content.strip()
+    if not content:
+        raise HTTPException(status_code=400, detail="Comment cannot be empty")
+
+    comment = RequestComment(
+        request_id=request_id,
+        author_id=current_user.id,
+        content=content,
+    )
+    db.add(comment)
+    db.commit()
+    db.refresh(comment)
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="PatientRequest",
+        entity_id=request_id,
+        ip_address=request.client.host if request and request.client else None,
+        details={"comment_added": True, "comment_id": comment.id},
+    )
+
+    return RequestCommentResponse(
+        id=comment.id,
+        request_id=comment.request_id,
+        author_id=comment.author_id,
+        author_full_name=current_user.full_name,
+        content=comment.content,
+        created_at=comment.created_at,
+    )
 
 
 @router.put("/{request_id}", response_model=PatientRequestResponse)
@@ -341,7 +464,7 @@ def assign_doctor(
     request_id: int,
     payload: AssignDoctorRequest,
     request: Request,
-    current_user: User = Depends(require_roles("admin", "registrar")),
+    current_user: User = Depends(require_roles("admin", "registrar", "doctor")),
     db: Session = Depends(get_db),
 ):
     doctor = (

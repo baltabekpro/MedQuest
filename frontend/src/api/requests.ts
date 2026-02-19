@@ -1,5 +1,5 @@
 import api from '@/api/client'
-import type { PaginatedResponse, PatientRequestResponse, RequestStatus } from '@/types/api'
+import type { AuditLogResponse, PaginatedResponse, PatientRequestResponse, RequestCommentResponse, RequestStatus } from '@/types/api'
 
 export const listRequests = async (params?: Record<string, string | number | undefined>) => {
   const { data } = await api.get<PaginatedResponse<PatientRequestResponse> | PatientRequestResponse[]>('/requests', { params })
@@ -31,5 +31,24 @@ export const changeStatus = async (id: number, status: RequestStatus) => {
 
 export const assignDoctor = async (id: number, doctor_id: number) => {
   const { data } = await api.patch<PatientRequestResponse>(`/requests/${id}/assign`, { doctor_id })
+  return data
+}
+
+export const deleteRequest = async (id: number) => {
+  await api.delete(`/requests/${id}`)
+}
+
+export const listRequestComments = async (id: number) => {
+  const { data } = await api.get<RequestCommentResponse[]>(`/requests/${id}/comments`)
+  return data
+}
+
+export const createRequestComment = async (id: number, content: string) => {
+  const { data } = await api.post<RequestCommentResponse>(`/requests/${id}/comments`, { content })
+  return data
+}
+
+export const listRequestHistory = async (id: number, params?: Record<string, string | number | undefined>) => {
+  const { data } = await api.get<PaginatedResponse<AuditLogResponse>>(`/requests/${id}/history`, { params })
   return data
 }

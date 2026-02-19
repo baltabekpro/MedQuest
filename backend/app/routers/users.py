@@ -19,9 +19,13 @@ def list_users(
     limit: int = Query(20, ge=1, le=100),
     search: str | None = Query(default=None),
     role: str | None = Query(default=None),
-    _: User = Depends(require_roles("admin")),
+    current_user: User = Depends(require_roles("admin", "doctor")),
     db: Session = Depends(get_db),
 ):
+    if current_user.role == "doctor":
+        if role != "doctor":
+            raise HTTPException(status_code=403, detail="Doctors can view only doctors list")
+
     query = db.query(User)
 
     if search:

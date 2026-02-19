@@ -22,6 +22,7 @@ def setup_test_db():
     seed_admin_user()
     yield
     Base.metadata.drop_all(bind=engine)
+    engine.dispose()
 
     if TEST_DB_PATH.exists():
         TEST_DB_PATH.unlink()

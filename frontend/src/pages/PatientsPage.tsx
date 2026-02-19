@@ -1,4 +1,4 @@
-import { Eye, Pencil, Plus, Trash } from 'lucide-react'
+import { Copy, Eye, Pencil, Plus, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -24,6 +24,21 @@ export const PatientsPage = () => {
   const query = usePatients({ page, limit: 20, search: debounced || undefined })
   const { deleteMutation } = usePatientMutations()
 
+  const items = query.data?.items ?? []
+  const total = query.data?.total ?? 0
+  const from = total ? (page - 1) * 20 + 1 : 0
+  const to = total ? Math.min(page * 20, total) : 0
+  const canNext = page * 20 < total
+
+  const copyToClipboard = async (value: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      toast.success(`${label} скопирован`) 
+    } catch {
+      toast.error('Не удалось скопировать')
+    }
+  }
+
   return (
     <Card>
       <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
@@ -33,7 +48,17 @@ export const PatientsPage = () => {
       <Table>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Дата рождения</TableHead><TableHead>Телефон</TableHead><TableHead>Email</TableHead><TableHead>Адрес</TableHead><TableHead>Дата регистрации</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
-          {(query.data?.items ?? []).map((patient) => (
+          {query.isLoading && (
+            <TableRow>
+              <TableCell colSpan={8} className='py-8 text-center text-sm text-muted'>Загрузка пациентов...</TableCell>
+            </TableRow>
+          )}
+          {!query.isLoading && items.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={8} className='py-8 text-center text-sm text-muted'>Пациенты не найдены</TableCell>
+            </TableRow>
+          )}
+          {items.map((patient) => (
             <TableRow key={patient.id}>
               <TableCell>{patient.id}</TableCell>
               <TableCell className='font-semibold'><Link to={`/patients/${patient.id}`}>{patient.full_name}</Link></TableCell>
@@ -45,6 +70,8 @@ export const PatientsPage = () => {
               <TableCell>
                 <div className='flex gap-2'>
                   <Link aria-label='Просмотр' to={`/patients/${patient.id}`}><Eye className='h-4 w-4' /></Link>
+                  <button type='button' aria-label='Скопировать телефон' onClick={() => copyToClipboard(patient.phone, 'Телефон')}><Copy className='h-4 w-4 text-slate-600' /></button>
+                  {patient.email ? <button type='button' aria-label='Скопировать email' onClick={() => copyToClipboard(patient.email!, 'Email')}><Copy className='h-4 w-4 text-blue-600' /></button> : null}
                   <button type='button' aria-label='Редактировать' onClick={() => { setEditingPatient(patient); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
@@ -68,10 +95,10 @@ export const PatientsPage = () => {
         </TableBody>
       </Table>
       <div className='mt-4 flex items-center justify-between text-sm text-muted'>
-        <span>Показано {(page - 1) * 20 + 1}–{Math.min(page * 20, query.data?.total ?? 0)} из {query.data?.total ?? 0}</span>
+        <span>Показано {from}–{to} из {total}</span>
         <div className='space-x-2'>
           <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Назад</Button>
-          <Button variant='outline' size='sm' disabled={(query.data?.items.length ?? 0) < 20} onClick={() => setPage((p) => p + 1)}>Вперед</Button>
+          <Button variant='outline' size='sm' disabled={!canNext} onClick={() => setPage((p) => p + 1)}>Вперед</Button>
         </div>
       </div>
       <PatientModal open={modalOpen} onOpenChange={setModalOpen} patient={editingPatient} />

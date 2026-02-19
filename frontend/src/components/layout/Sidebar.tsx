@@ -1,4 +1,4 @@
-import { ClipboardList, FileText, LayoutDashboard, LogOut, UserCog, Users } from 'lucide-react'
+import { ClipboardList, FileText, LayoutDashboard, LogOut, User, UserCog, Users } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { roleLabel } from '@/utils/roleLabel'
@@ -8,6 +8,7 @@ const links = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/patients', label: 'Пациенты', icon: Users },
   { to: '/requests', label: 'Запросы', icon: FileText },
+  { to: '/profile', label: 'Мой профиль', icon: User },
   { to: '/users', label: 'Пользователи', icon: UserCog, adminOnly: true },
   { to: '/audit', label: 'Аудит', icon: ClipboardList, adminOnly: true },
 ]
@@ -19,7 +20,7 @@ export const Sidebar = () => {
   return (
     <aside className='flex h-screen w-64 flex-col border-r border-border bg-sidebar p-4'>
       <div className='mb-8 flex items-center gap-2 text-primary'>
-        <div className='grid h-8 w-8 place-items-center rounded-md bg-primary text-white'>+</div>
+        <img src='/medquest-icon.svg' alt='MedQuest' className='h-8 w-8 rounded-md' />
         <span className='text-lg font-semibold'>MedQuest</span>
       </div>
       <nav className='space-y-1'>

@@ -1,0 +1,21 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="mqBg" x1="32" y1="24" x2="224" y2="232" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#06B6D4"/>
+    </linearGradient>
+    <linearGradient id="mqPulse" x1="56" y1="128" x2="200" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E2E8F0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="16" y="16" width="224" height="224" rx="56" fill="url(#mqBg)"/>
+
+  <rect x="70" y="78" width="116" height="100" rx="16" fill="white" fill-opacity="0.96"/>
+
+  <path d="M128 96V160" stroke="#2563EB" stroke-width="12" stroke-linecap="round"/>
+  <path d="M96 128H160" stroke="#2563EB" stroke-width="12" stroke-linecap="round"/>
+
+  <path d="M56 168H92L106 145L126 186L145 154L156 168H200" stroke="url(#mqPulse)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

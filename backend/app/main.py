@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.core.security import get_password_hash
 from app.database import SessionLocal
 from app.models import User
-from app.routers import audit, auth, dashboard, patients, requests, users
+from app.routers import audit, auth, dashboard, notifications, patients, requests, users
 
 
 @asynccontextmanager
@@ -40,6 +40,7 @@ app.include_router(patients.router)
 app.include_router(requests.router)
 app.include_router(dashboard.router)
 app.include_router(audit.router)
+app.include_router(notifications.router)
 
 
 def seed_admin_user() -> None:
@@ -50,19 +51,38 @@ def seed_admin_user() -> None:
             legacy_admin.email = "admin@medquest.kz"
             db.commit()
 
-        admin = db.query(User).filter(User.email == "admin@medquest.kz").first()
-        if admin:
-            return
+        def ensure_user(*, email: str, full_name: str, role: str, password: str) -> None:
+            existing = db.query(User).filter(User.email == email).first()
+            if existing:
+                return
+            user = User(
+                email=email,
+                full_name=full_name,
+                role=role,
+                hashed_password=get_password_hash(password),
+                is_active=True,
+            )
+            db.add(user)
+            db.commit()
 
-        admin = User(
+        ensure_user(
             email="admin@medquest.kz",
             full_name="System Administrator",
             role="admin",
-            hashed_password=get_password_hash("admin123"),
-            is_active=True,
+            password="admin123",
         )
-        db.add(admin)
-        db.commit()
+        ensure_user(
+            email="registrar@medquest.kz",
+            full_name="Registrar Demo",
+            role="registrar",
+            password="registrar123",
+        )
+        ensure_user(
+            email="doctor@medquest.kz",
+            full_name="Doctor Demo",
+            role="doctor",
+            password="doctor123",
+        )
     finally:
         db.close()
 

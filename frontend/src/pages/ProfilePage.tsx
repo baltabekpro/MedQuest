@@ -25,6 +25,13 @@ export const ProfilePage = () => {
     retry: false,
   })
 
+  const formatSessionDate = (value: string | null | undefined) => {
+    if (!value) return '—'
+    const date = new Date(value)
+    if (Number.isNaN(date.getTime())) return '—'
+    return date.toLocaleString('ru-RU')
+  }
+
   return (
     <div className='space-y-4'>
       <Card>
@@ -45,9 +52,15 @@ export const ProfilePage = () => {
       </Card>
       <Card>
         <h2 className='mb-3 text-lg font-semibold'>Активность</h2>
-        {(sessionsQuery.data ?? [{ id: '1', device: 'Chrome', ip: '127.0.0.1', created_at: new Date().toISOString() }]).map((session) => (
-          <p key={session.id} className='text-sm'>{session.device} · {session.ip} · {new Date(session.created_at).toLocaleString('ru-RU')}</p>
-        ))}
+        {(sessionsQuery.data ?? []).length ? (
+          (sessionsQuery.data ?? []).map((session) => (
+            <p key={session.id} className='text-sm'>
+              {(session.user_agent ?? 'Неизвестное устройство')} · {(session.ip_address ?? 'IP не определён')} · {formatSessionDate(session.timestamp)}
+            </p>
+          ))
+        ) : (
+          <p className='text-sm text-muted'>Событий активности пока нет</p>
+        )}
       </Card>
     </div>
   )

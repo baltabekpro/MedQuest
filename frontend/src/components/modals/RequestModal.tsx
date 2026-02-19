@@ -67,33 +67,67 @@ export const RequestModal = ({ open, onOpenChange, request, patientId }: Request
       <DialogContent>
         <DialogTitle>{request ? 'Редактировать запрос' : 'Создать запрос'}</DialogTitle>
         <form onSubmit={submit} className='mt-4 space-y-3'>
-          <Select value={String(form.watch('patient_id') ?? '')} onValueChange={(value) => form.setValue('patient_id', Number(value))}>
-            <SelectTrigger>
-              <SelectValue placeholder='Пациент' />
-            </SelectTrigger>
-            <SelectContent>
-              {patientsQuery.data?.items.map((patient) => (
-                <SelectItem key={patient.id} value={String(patient.id)}>
-                  {patient.full_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Input placeholder='Заголовок' {...form.register('title')} />
-          <Textarea placeholder='Описание' {...form.register('description')} />
-          <Input type='number' min={1} max={5} {...form.register('priority', { valueAsNumber: true })} />
-          <Select value={String(form.watch('assigned_doctor_id') ?? '')} onValueChange={(value) => form.setValue('assigned_doctor_id', value ? Number(value) : null)}>
-            <SelectTrigger>
-              <SelectValue placeholder='Врач' />
-            </SelectTrigger>
-            <SelectContent>
-              {(doctorsQuery.data?.items ?? []).map((doctor) => (
-                <SelectItem key={doctor.id} value={String(doctor.id)}>
-                  {doctor.full_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Пациент</label>
+            <Select value={form.watch('patient_id') ? String(form.watch('patient_id')) : undefined} onValueChange={(value) => form.setValue('patient_id', Number(value))}>
+              <SelectTrigger>
+                <SelectValue placeholder='Выберите пациента...' />
+              </SelectTrigger>
+              <SelectContent>
+                {(patientsQuery.data?.items ?? []).length > 0
+                  ? patientsQuery.data?.items.map((patient) => (
+                      <SelectItem key={patient.id} value={String(patient.id)}>
+                        {patient.full_name}
+                      </SelectItem>
+                    ))
+                  : <div className='px-2 py-1.5 text-sm text-muted-foreground'>Данные отсутствуют</div>}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.patient_id?.message ? (
+              <div className='text-xs text-red-600'>{form.formState.errors.patient_id.message.toString()}</div>
+            ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Заголовок</label>
+            <Input placeholder='Например: Боль в спине' {...form.register('title')} />
+            {form.formState.errors.title?.message ? (
+              <div className='text-xs text-red-600'>{form.formState.errors.title.message.toString()}</div>
+            ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Описание</label>
+            <Textarea placeholder='Опишите проблему пациента' {...form.register('description')} />
+            {form.formState.errors.description?.message ? (
+              <div className='text-xs text-red-600'>{form.formState.errors.description.message.toString()}</div>
+            ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Приоритет (1 — низкий, 5 — высокий)</label>
+            <Input type='number' min={1} max={5} {...form.register('priority', { valueAsNumber: true })} />
+            {form.formState.errors.priority?.message ? (
+              <div className='text-xs text-red-600'>{form.formState.errors.priority.message.toString()}</div>
+            ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Ответственный врач</label>
+            <Select value={form.watch('assigned_doctor_id') ? String(form.watch('assigned_doctor_id')) : undefined} onValueChange={(value) => form.setValue('assigned_doctor_id', value ? Number(value) : null)}>
+              <SelectTrigger>
+                <SelectValue placeholder='Выберите врача...' />
+              </SelectTrigger>
+              <SelectContent>
+                {(doctorsQuery.data?.items ?? []).length > 0
+                  ? (doctorsQuery.data?.items ?? []).map((doctor) => (
+                      <SelectItem key={doctor.id} value={String(doctor.id)}>
+                        {doctor.full_name}
+                      </SelectItem>
+                    ))
+                  : <div className='px-2 py-1.5 text-sm text-muted-foreground'>Данные отсутствуют</div>}
+              </SelectContent>
+            </Select>
+            {form.formState.errors.assigned_doctor_id?.message ? (
+              <div className='text-xs text-red-600'>{form.formState.errors.assigned_doctor_id.message.toString()}</div>
+            ) : null}
+          </div>
           <Button type='submit' className='w-full'>
             Сохранить
           </Button>

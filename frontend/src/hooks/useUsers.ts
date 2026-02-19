@@ -2,8 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createUser, deleteUser, listUsers, updateUser } from '@/api/users'
 import type { UserResponse } from '@/types/api'
 
-export const useUsers = (params?: Record<string, string | number | undefined>) =>
-  useQuery({ queryKey: ['users', params], queryFn: () => listUsers(params) })
+export const useUsers = (
+  params?: Record<string, string | number | undefined>,
+  enabled: boolean = true,
+) => useQuery({ queryKey: ['users', params], queryFn: () => listUsers(params), enabled })
 
 export const useUserMutations = () => {
   const queryClient = useQueryClient()

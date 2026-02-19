@@ -125,6 +125,20 @@ async def test_auth_rbac_filters_and_crud_flow(async_client):
     assert patient_create.status_code == 201
     patient_id = patient_create.json()["id"]
 
+    patient_create_empty_email = await async_client.post(
+        "/patients",
+        headers=auth_headers(registrar_access),
+        json={
+            "full_name": "Пациент Без Email",
+            "birth_date": "1991-01-01",
+            "phone": "+77000000002",
+            "email": "",
+            "address": "",
+        },
+    )
+    assert patient_create_empty_email.status_code == 201
+    assert patient_create_empty_email.json()["email"] is None
+
     patient_search = await async_client.get(
         "/patients",
         headers=auth_headers(registrar_access),
@@ -146,6 +160,50 @@ async def test_auth_rbac_filters_and_crud_flow(async_client):
     )
     assert request_create.status_code == 201
     request_id = request_create.json()["id"]
+
+    comment_create = await async_client.post(
+        f"/requests/{request_id}/comments",
+        headers=auth_headers(registrar_access),
+        json={"content": "Пациенту назначен повторный осмотр"},
+    )
+    assert comment_create.status_code == 201
+    assert comment_create.json()["request_id"] == request_id
+
+    comments_list = await async_client.get(
+        f"/requests/{request_id}/comments",
+        headers=auth_headers(registrar_access),
+    )
+    assert comments_list.status_code == 200
+    assert isinstance(comments_list.json(), list)
+    assert len(comments_list.json()) >= 1
+
+    request_create_with_doctor = await async_client.post(
+        "/requests",
+        headers=auth_headers(registrar_access),
+        json={
+            "patient_id": patient_id,
+            "title": "Боль в колене",
+            "description": "Травма",
+            "priority": 2,
+            "assigned_doctor_id": doctor_id,
+        },
+    )
+    assert request_create_with_doctor.status_code == 201
+    assert request_create_with_doctor.json()["assigned_doctor_id"] == doctor_id
+    doctor_request_id = request_create_with_doctor.json()["id"]
+
+    request_create_unassigned = await async_client.post(
+        "/requests",
+        headers=auth_headers(registrar_access),
+        json={
+            "patient_id": patient_id,
+            "title": "Без назначения",
+            "description": "Только для проверки доступа",
+            "priority": 3,
+        },
+    )
+    assert request_create_unassigned.status_code == 201
+    unassigned_request_id = request_create_unassigned.json()["id"]
 
     assign = await async_client.patch(
         f"/requests/{request_id}/assign",
@@ -180,6 +238,60 @@ async def test_auth_rbac_filters_and_crud_flow(async_client):
     assert requests_payload["total"] >= 1
     assert requests_payload["items"][0]["patient_full_name"] == "Иван Петров"
 
+    doctor_tokens = await login(async_client, doctor_email, "doc12345")
+    doctor_access = doctor_tokens["access_token"]
+
+    doctor_requests = await async_client.get(
+        "/requests",
+        headers=auth_headers(doctor_access),
+        params={"page": 1, "limit": 50},
+    )
+    assert doctor_requests.status_code == 200
+    assert doctor_requests.json()["total"] >= 2
+
+    doctor_request_get = await async_client.get(
+        f"/requests/{doctor_request_id}",
+        headers=auth_headers(doctor_access),
+    )
+    assert doctor_request_get.status_code == 200
+
+    doctor_request_history = await async_client.get(
+        f"/requests/{doctor_request_id}/history",
+        headers=auth_headers(doctor_access),
+        params={"page": 1, "limit": 20},
+    )
+    assert doctor_request_history.status_code == 200
+    assert "items" in doctor_request_history.json()
+
+    doctor_assign = await async_client.patch(
+        f"/requests/{unassigned_request_id}/assign",
+        headers=auth_headers(doctor_access),
+        json={"doctor_id": doctor_id},
+    )
+    assert doctor_assign.status_code == 200
+    assert doctor_assign.json()["assigned_doctor_id"] == doctor_id
+
+    doctor_forbidden_get = await async_client.get(
+        f"/requests/{unassigned_request_id}",
+        headers=auth_headers(doctor_access),
+    )
+    assert doctor_forbidden_get.status_code == 200
+
+    doctor_list_doctors = await async_client.get(
+        "/users",
+        headers=auth_headers(doctor_access),
+        params={"role": "doctor", "page": 1, "limit": 50},
+    )
+    assert doctor_list_doctors.status_code == 200
+    assert all(item["role"] == "doctor" for item in doctor_list_doctors.json().get("items", []))
+
+    doctor_list_all_forbidden = await async_client.get(
+        "/users",
+        headers=auth_headers(doctor_access),
+        params={"page": 1, "limit": 50},
+    )
+    assert doctor_list_all_forbidden.status_code == 403
+
     dashboard = await async_client.get("/dashboard/stats", headers=auth_headers(registrar_access))
     assert dashboard.status_code == 200
     assert "requests_closed_today" in dashboard.json()
@@ -212,6 +324,41 @@ async def test_auth_rbac_filters_and_crud_flow(async_client):
     if audit_payload["items"]:
         assert "ip_address" in audit_payload["items"][0]
         assert "user_full_name" in audit_payload["items"][0]
+
+    # entity_id filter should work
+    audit_for_request = await async_client.get(
+        "/audit/logs",
+        headers=auth_headers(admin_access),
+        params={"entity_type": "PatientRequest", "entity_id": request_id, "page": 1, "limit": 50},
+    )
+    assert audit_for_request.status_code == 200
+    for item in audit_for_request.json().get("items", []):
+        assert item["entity_type"] == "PatientRequest"
+        assert item["entity_id"] == request_id
+
+    # notifications endpoints
+    notif_list = await async_client.get(
+        "/notifications",
+        headers=auth_headers(admin_access),
+        params={"limit": 20},
+    )
+    assert notif_list.status_code == 200
+    payload = notif_list.json()
+    assert "unread_count" in payload and "items" in payload
+
+    notif_mark = await async_client.post(
+        "/notifications/mark-read",
+        headers=auth_headers(admin_access),
+    )
+    assert notif_mark.status_code == 200
+
+    notif_list2 = await async_client.get(
+        "/notifications",
+        headers=auth_headers(admin_access),
+        params={"limit": 20},
+    )
+    assert notif_list2.status_code == 200
+    assert notif_list2.json()["unread_count"] == 0
 
     delete_request = await async_client.delete(f"/requests/{request_id}", headers=auth_headers(registrar_access))
     assert delete_request.status_code == 204

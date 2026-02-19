@@ -1,6 +1,17 @@
 from pydantic import BaseModel
 
 
+class DashboardActivityPoint(BaseModel):
+    date: str  # YYYY-MM-DD
+    day: str
+    value: int
+
+
+class DashboardWeeklyActivity(BaseModel):
+    days: int
+    points: list[DashboardActivityPoint]
+
+
 class DashboardStats(BaseModel):
     total_patients: int
     total_requests: int

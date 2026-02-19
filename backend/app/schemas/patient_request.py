@@ -8,6 +8,7 @@ class PatientRequestCreate(BaseModel):
     title: str
     description: str
     priority: int = Field(default=3, ge=1, le=5)
+    assigned_doctor_id: int | None = None
 
 
 class PatientRequestUpdate(BaseModel):
@@ -24,6 +25,21 @@ class AssignDoctorRequest(BaseModel):
 
 class ChangeStatusRequest(BaseModel):
     status: str
+
+
+class RequestCommentCreate(BaseModel):
+    content: str = Field(min_length=1, max_length=4000)
+
+
+class RequestCommentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    request_id: int
+    author_id: int
+    author_full_name: str
+    content: str
+    created_at: datetime
 
 
 class PatientRequestResponse(BaseModel):

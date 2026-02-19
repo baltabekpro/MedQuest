@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends
 from sqlalchemy import func
@@ -6,12 +6,52 @@ from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user
 from app.database import get_db
+from app.models.audit_log import AuditLog
 from app.models.patient import Patient
 from app.models.patient_request import PatientRequest
 from app.models.user import User
-from app.schemas.dashboard import DashboardStats
+from app.schemas.dashboard import DashboardActivityPoint, DashboardStats, DashboardWeeklyActivity
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
+
+
+_WEEKDAYS_RU = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
+
+
+@router.get("/activity", response_model=DashboardWeeklyActivity)
+def weekly_activity(
+    days: int = 7,
+    _: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    days = max(1, min(days, 30))
+
+    today_utc: date = datetime.now(timezone.utc).date()
+    start_date = today_utc - timedelta(days=days - 1)
+    start_dt = datetime.combine(start_date, datetime.min.time(), tzinfo=timezone.utc)
+
+    # SQLite: func.date(timestamp) -> 'YYYY-MM-DD'
+    rows = (
+        db.query(func.date(AuditLog.timestamp).label("d"), func.count(AuditLog.id).label("c"))
+        .filter(AuditLog.timestamp >= start_dt)
+        .group_by("d")
+        .all()
+    )
+    counts_by_date = {str(r.d): int(r.c) for r in rows if r.d is not None}
+
+    points: list[DashboardActivityPoint] = []
+    for i in range(days):
+        d = start_date + timedelta(days=i)
+        d_str = d.isoformat()
+        points.append(
+            DashboardActivityPoint(
+                date=d_str,
+                day=_WEEKDAYS_RU[d.weekday()],
+                value=counts_by_date.get(d_str, 0),
+            )
+        )
+
+    return DashboardWeeklyActivity(days=days, points=points)
 
 
 @router.get("/stats", response_model=DashboardStats)

@@ -21,7 +21,13 @@ export const updateMe = async (full_name: string) => {
 }
 
 export const getSessions = async () => {
-  // TODO: BACKEND_TASK #10 — не реализовано
   const { data } = await api.get('/auth/sessions')
-  return data as Array<{ id: string; device: string; ip: string; created_at: string }>
+  return data as Array<{
+    id: number
+    user_id: number | null
+    timestamp: string
+    ip_address: string | null
+    user_agent: string | null
+    success: boolean
+  }>
 }

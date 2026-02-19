@@ -1,6 +1,6 @@
 from datetime import date, datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator
 
 
 class PatientBase(BaseModel):
@@ -9,6 +9,13 @@ class PatientBase(BaseModel):
     phone: str
     email: EmailStr | None = None
     address: str | None = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def empty_email_to_none(cls, value):
+        if value == "":
+            return None
+        return value
 
 
 class PatientCreate(PatientBase):
@@ -21,6 +28,13 @@ class PatientUpdate(BaseModel):
     phone: str | None = None
     email: EmailStr | None = None
     address: str | None = None
+
+    @field_validator("email", mode="before")
+    @classmethod
+    def empty_email_to_none(cls, value):
+        if value == "":
+            return None
+        return value
 
 
 class PatientResponse(PatientBase):

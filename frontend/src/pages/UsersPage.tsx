@@ -21,9 +21,11 @@ export const UsersPage = () => {
   const [tab, setTab] = useState<'all' | 'admin' | 'registrar' | 'doctor'>('all')
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
+  const [editingUser, setEditingUser] = useState<import('@/types/api').UserResponse | undefined>()
   const debounced = useDebounce(search)
   const query = useUsers({ role: tab === 'all' ? undefined : tab, search: debounced || undefined })
-  const { deleteMutation, updateMutation } = useUserMutations()
+  const { deleteMutation } = useUserMutations()
+  const items = query.data?.items ?? []
 
   return (
     <Card>
@@ -33,13 +35,23 @@ export const UsersPage = () => {
             <TabsTrigger value='all'>Все</TabsTrigger><TabsTrigger value='admin'>Администраторы</TabsTrigger><TabsTrigger value='registrar'>Регистраторы</TabsTrigger><TabsTrigger value='doctor'>Врачи</TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button onClick={() => setModalOpen(true)}><Plus className='mr-2 h-4 w-4' />Добавить пользователя</Button>
+        <Button onClick={() => { setEditingUser(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пользователя</Button>
       </div>
-      <Input className='mb-4 max-w-sm' placeholder='Поиск...' value={search} onChange={(e) => setSearch(e.target.value)} />
+      <Input className='mb-4 max-w-sm' placeholder='Поиск по ФИО или email...' value={search} onChange={(e) => setSearch(e.target.value)} />
       <Table>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Email</TableHead><TableHead>Роль</TableHead><TableHead>Статус</TableHead><TableHead>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
-          {(query.data?.items ?? []).map((user) => (
+          {query.isLoading && (
+            <TableRow>
+              <TableCell colSpan={7} className='py-8 text-center text-sm text-muted'>Загрузка пользователей...</TableCell>
+            </TableRow>
+          )}
+          {!query.isLoading && items.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className='py-8 text-center text-sm text-muted'>Пользователи не найдены</TableCell>
+            </TableRow>
+          )}
+          {items.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
               <TableCell>{user.full_name}</TableCell>
@@ -49,7 +61,7 @@ export const UsersPage = () => {
               <TableCell>{new Date(user.created_at).toLocaleDateString('ru-RU')}</TableCell>
               <TableCell>
                 <div className='flex gap-2'>
-                  <button type='button' aria-label='Редактировать' onClick={() => updateMutation.mutate({ id: user.id, payload: { is_active: !user.is_active } })}><Pencil className='h-4 w-4' /></button>
+                  <button type='button' aria-label='Редактировать' onClick={() => { setEditingUser(user); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
                   <button type='button' aria-label='Удалить' onClick={() => deleteMutation.mutate(user.id)}><Trash className='h-4 w-4 text-red-600' /></button>
                 </div>
               </TableCell>
@@ -57,7 +69,7 @@ export const UsersPage = () => {
           ))}
         </TableBody>
       </Table>
-      <UserModal open={modalOpen} onOpenChange={setModalOpen} />
+      <UserModal open={modalOpen} onOpenChange={setModalOpen} user={editingUser} />
     </Card>
   )
 }

@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { PatientModal } from '@/components/modals/PatientModal'
 import { RequestModal } from '@/components/modals/RequestModal'
+import { statusLabel } from '@/utils/statusLabel'
 
 export const PatientProfilePage = () => {
   const { id = '0' } = useParams()
@@ -46,7 +47,7 @@ export const PatientProfilePage = () => {
             <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Заголовок</TableHead><TableHead>Статус</TableHead></TableRow></TableHeader>
             <TableBody>
               {(requestsQuery.data?.items ?? []).map((request) => (
-                <TableRow key={request.id}><TableCell>{request.id}</TableCell><TableCell><Link to={`/requests/${request.id}`}>{request.title}</Link></TableCell><TableCell>{request.status}</TableCell></TableRow>
+                <TableRow key={request.id}><TableCell>{request.id}</TableCell><TableCell><Link to={`/requests/${request.id}`}>{request.title}</Link></TableCell><TableCell>{statusLabel[request.status] ?? request.status}</TableCell></TableRow>
               ))}
             </TableBody>
           </Table>

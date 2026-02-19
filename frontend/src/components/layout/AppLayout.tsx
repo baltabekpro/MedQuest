@@ -17,11 +17,11 @@ export const AppLayout = () => {
   const title = titles[Object.keys(titles).find((key) => location.pathname.startsWith(key)) ?? '/dashboard']
 
   return (
-    <div className='flex min-h-screen bg-background'>
+    <div className='flex h-screen overflow-hidden bg-background'>
       <Sidebar />
-      <div className='flex min-h-screen flex-1 flex-col'>
+      <div className='flex min-h-0 flex-1 flex-col'>
         <Header title={title} />
-        <main className='flex-1 p-6'>
+        <main className='min-h-0 flex-1 overflow-y-auto p-6'>
           <Outlet />
         </main>
       </div>
