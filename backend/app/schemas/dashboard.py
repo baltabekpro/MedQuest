@@ -7,3 +7,4 @@ class DashboardStats(BaseModel):
     requests_new: int
     requests_in_progress: int
     requests_closed: int
+    requests_closed_today: int

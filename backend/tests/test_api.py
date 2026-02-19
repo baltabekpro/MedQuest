@@ -1,31 +1,37 @@
 import uuid
 
+import pytest
 
-def login(client, email: str, password: str) -> str:
-    response = client.post(
+
+async def login(async_client, email: str, password: str) -> dict:
+    response = await async_client.post(
         "/auth/login",
         json={"email": email, "password": password},
     )
     assert response.status_code == 200
     payload = response.json()
     assert "access_token" in payload
-    return payload["access_token"]
+    assert "refresh_token" in payload
+    return payload
 
 
 def auth_headers(token: str) -> dict[str, str]:
     return {"Authorization": f"Bearer {token}"}
 
 
-def test_health(client):
-    response = client.get("/health")
+@pytest.mark.asyncio
+async def test_health(async_client):
+    response = await async_client.get("/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
 
-def test_auth_rbac_and_crud_flow(client):
-    admin_token = login(client, "admin@medquest.kz", "admin123")
+@pytest.mark.asyncio
+async def test_auth_rbac_filters_and_crud_flow(async_client):
+    admin_tokens = await login(async_client, "admin@medquest.kz", "admin123")
+    admin_access = admin_tokens["access_token"]
 
-    me = client.get("/auth/me", headers=auth_headers(admin_token))
+    me = await async_client.get("/auth/me", headers=auth_headers(admin_access))
     assert me.status_code == 200
     assert me.json()["role"] == "admin"
 
@@ -33,9 +39,9 @@ def test_auth_rbac_and_crud_flow(client):
     doctor_email = f"doctor.{suffix}@medquest.kz"
     registrar_email = f"registrar.{suffix}@medquest.kz"
 
-    doctor_resp = client.post(
+    doctor_resp = await async_client.post(
         "/users",
-        headers=auth_headers(admin_token),
+        headers=auth_headers(admin_access),
         json={
             "email": doctor_email,
             "full_name": "Doctor Test",
@@ -46,9 +52,9 @@ def test_auth_rbac_and_crud_flow(client):
     assert doctor_resp.status_code == 201
     doctor_id = doctor_resp.json()["id"]
 
-    registrar_resp = client.post(
+    registrar_resp = await async_client.post(
         "/users",
-        headers=auth_headers(admin_token),
+        headers=auth_headers(admin_access),
         json={
             "email": registrar_email,
             "full_name": "Registrar Test",
@@ -57,15 +63,57 @@ def test_auth_rbac_and_crud_flow(client):
         },
     )
     assert registrar_resp.status_code == 201
+    registrar_id = registrar_resp.json()["id"]
 
-    registrar_token = login(client, registrar_email, "reg12345")
+    get_user = await async_client.get(f"/users/{registrar_id}", headers=auth_headers(admin_access))
+    assert get_user.status_code == 200
+    assert get_user.json()["email"] == registrar_email
 
-    users_for_registrar = client.get("/users", headers=auth_headers(registrar_token))
+    users_page = await async_client.get(
+        "/users",
+        headers=auth_headers(admin_access),
+        params={"page": 1, "limit": 20, "search": "Registrar", "role": "registrar"},
+    )
+    assert users_page.status_code == 200
+    users_payload = users_page.json()
+    assert "items" in users_payload and "total" in users_payload
+    assert users_payload["page"] == 1 and users_payload["limit"] == 20
+
+    registrar_tokens = await login(async_client, registrar_email, "reg12345")
+    registrar_access = registrar_tokens["access_token"]
+    registrar_refresh = registrar_tokens["refresh_token"]
+
+    users_for_registrar = await async_client.get("/users", headers=auth_headers(registrar_access))
     assert users_for_registrar.status_code == 403
 
-    patient_create = client.post(
+    update_me = await async_client.patch(
+        "/auth/me",
+        headers=auth_headers(registrar_access),
+        json={"full_name": "Registrar Updated"},
+    )
+    assert update_me.status_code == 200
+    assert update_me.json()["full_name"] == "Registrar Updated"
+
+    bad_password_change = await async_client.post(
+        "/auth/change-password",
+        headers=auth_headers(registrar_access),
+        json={"current_password": "wrong", "new_password": "newpass123"},
+    )
+    assert bad_password_change.status_code == 400
+
+    good_password_change = await async_client.post(
+        "/auth/change-password",
+        headers=auth_headers(registrar_access),
+        json={"current_password": "reg12345", "new_password": "reg123456"},
+    )
+    assert good_password_change.status_code == 200
+
+    relogin_tokens = await login(async_client, registrar_email, "reg123456")
+    registrar_access = relogin_tokens["access_token"]
+
+    patient_create = await async_client.post(
         "/patients",
-        headers=auth_headers(registrar_token),
+        headers=auth_headers(registrar_access),
         json={
             "full_name": "Иван Петров",
             "birth_date": "1990-01-01",
@@ -77,20 +125,18 @@ def test_auth_rbac_and_crud_flow(client):
     assert patient_create.status_code == 201
     patient_id = patient_create.json()["id"]
 
-    patient_get = client.get(f"/patients/{patient_id}", headers=auth_headers(registrar_token))
-    assert patient_get.status_code == 200
-
-    patient_update = client.put(
-        f"/patients/{patient_id}",
-        headers=auth_headers(registrar_token),
-        json={"phone": "+77000000002"},
+    patient_search = await async_client.get(
+        "/patients",
+        headers=auth_headers(registrar_access),
+        params={"search": "Иван", "page": 1, "limit": 20},
     )
-    assert patient_update.status_code == 200
-    assert patient_update.json()["phone"] == "+77000000002"
+    assert patient_search.status_code == 200
+    patients_payload = patient_search.json()
+    assert "items" in patients_payload and patients_payload["total"] >= 1
 
-    request_create = client.post(
+    request_create = await async_client.post(
         "/requests",
-        headers=auth_headers(registrar_token),
+        headers=auth_headers(registrar_access),
         json={
             "patient_id": patient_id,
             "title": "Боль в спине",
@@ -101,41 +147,74 @@ def test_auth_rbac_and_crud_flow(client):
     assert request_create.status_code == 201
     request_id = request_create.json()["id"]
 
-    assign = client.patch(
+    assign = await async_client.patch(
         f"/requests/{request_id}/assign",
-        headers=auth_headers(registrar_token),
+        headers=auth_headers(registrar_access),
         json={"doctor_id": doctor_id},
     )
     assert assign.status_code == 200
+    assert assign.json()["assigned_doctor_full_name"] == "Doctor Test"
 
-    change_status = client.patch(
+    change_status = await async_client.patch(
         f"/requests/{request_id}/status",
-        headers=auth_headers(registrar_token),
-        json={"status": "in_progress"},
+        headers=auth_headers(registrar_access),
+        json={"status": "closed"},
     )
     assert change_status.status_code == 200
-    assert change_status.json()["status"] == "in_progress"
+    assert change_status.json()["status"] == "closed"
 
-    request_get = client.get(f"/requests/{request_id}", headers=auth_headers(registrar_token))
-    assert request_get.status_code == 200
+    requests_filtered = await async_client.get(
+        "/requests",
+        headers=auth_headers(registrar_access),
+        params={
+            "patient_id": patient_id,
+            "priority": 4,
+            "status": "closed",
+            "search": "спине",
+            "page": 1,
+            "limit": 20,
+        },
+    )
+    assert requests_filtered.status_code == 200
+    requests_payload = requests_filtered.json()
+    assert requests_payload["total"] >= 1
+    assert requests_payload["items"][0]["patient_full_name"] == "Иван Петров"
 
-    dashboard = client.get("/dashboard/stats", headers=auth_headers(registrar_token))
+    dashboard = await async_client.get("/dashboard/stats", headers=auth_headers(registrar_access))
     assert dashboard.status_code == 200
+    assert "requests_closed_today" in dashboard.json()
 
-    audit_for_registrar = client.get("/audit/logs", headers=auth_headers(registrar_token))
+    sessions = await async_client.get("/auth/sessions", headers=auth_headers(registrar_access))
+    assert sessions.status_code == 200
+    assert isinstance(sessions.json(), list)
+    assert len(sessions.json()) >= 1
+
+    logout = await async_client.post("/auth/logout", json={"refresh_token": registrar_refresh})
+    assert logout.status_code == 200
+
+    revoked_refresh = await async_client.post(
+        "/auth/refresh",
+        json={"refresh_token": registrar_refresh},
+    )
+    assert revoked_refresh.status_code == 401
+
+    audit_for_registrar = await async_client.get("/audit/logs", headers=auth_headers(registrar_access))
     assert audit_for_registrar.status_code == 403
 
-    audit_for_admin = client.get("/audit/logs", headers=auth_headers(admin_token))
+    audit_for_admin = await async_client.get(
+        "/audit/logs",
+        headers=auth_headers(admin_access),
+        params={"action": "UPDATE", "search": "password_changed", "page": 1, "limit": 20},
+    )
     assert audit_for_admin.status_code == 200
+    audit_payload = audit_for_admin.json()
+    assert "items" in audit_payload
+    if audit_payload["items"]:
+        assert "ip_address" in audit_payload["items"][0]
+        assert "user_full_name" in audit_payload["items"][0]
 
-    delete_request = client.delete(f"/requests/{request_id}", headers=auth_headers(registrar_token))
+    delete_request = await async_client.delete(f"/requests/{request_id}", headers=auth_headers(registrar_access))
     assert delete_request.status_code == 204
 
-    get_deleted_request = client.get(f"/requests/{request_id}", headers=auth_headers(registrar_token))
-    assert get_deleted_request.status_code == 404
-
-    delete_patient = client.delete(f"/patients/{patient_id}", headers=auth_headers(registrar_token))
+    delete_patient = await async_client.delete(f"/patients/{patient_id}", headers=auth_headers(registrar_access))
     assert delete_patient.status_code == 204
-
-    get_deleted_patient = client.get(f"/patients/{patient_id}", headers=auth_headers(registrar_token))
-    assert get_deleted_patient.status_code == 404

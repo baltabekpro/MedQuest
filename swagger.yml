@@ -80,37 +80,19 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
       security:
       - HTTPBearer: []
-  /users:
-    get:
+    patch:
       tags:
-      - Users
-      summary: List Users
-      operationId: list_users_users_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/UserResponse'
-                type: array
-                title: Response List Users Users Get
-      security:
-      - HTTPBearer: []
-    post:
-      tags:
-      - Users
-      summary: Create User
-      operationId: create_user_users_post
+      - Auth
+      summary: Update Me
+      operationId: update_me_auth_me_patch
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreate'
+              $ref: '#/components/schemas/UpdateProfileRequest'
         required: true
       responses:
-        '201':
+        '200':
           description: Successful Response
           content:
             application/json:
@@ -124,7 +106,185 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
       security:
       - HTTPBearer: []
+  /auth/change-password:
+    post:
+      tags:
+      - Auth
+      summary: Change Password
+      operationId: change_password_auth_change_password_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangePasswordRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+      security:
+      - HTTPBearer: []
+  /auth/sessions:
+    get:
+      tags:
+      - Auth
+      summary: Get Sessions
+      operationId: get_sessions_auth_sessions_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/LoginEventResponse'
+                type: array
+                title: Response Get Sessions Auth Sessions Get
+      security:
+      - HTTPBearer: []
+  /auth/logout:
+    post:
+      tags:
+      - Auth
+      summary: Logout
+      operationId: logout_auth_logout_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /users:
+    get:
+      tags:
+      - Users
+      summary: List Users
+      operationId: list_users_users_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Limit
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
+      - name: role
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Role
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedResponse_UserResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - Users
+      summary: Create User
+      operationId: create_user_users_post
+      security:
+      - HTTPBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /users/{user_id}:
+    get:
+      tags:
+      - Users
+      summary: Get User
+      operationId: get_user_users__user_id__get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: User Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
     put:
       tags:
       - Users
@@ -187,29 +347,60 @@ paths:
       - Patients
       summary: List Patients
       operationId: list_patients_patients_get
+      security:
+      - HTTPBearer: []
+      parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Limit
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                items:
-                  $ref: '#/components/schemas/PatientResponse'
-                type: array
-                title: Response List Patients Patients Get
-      security:
-      - HTTPBearer: []
+                $ref: '#/components/schemas/PaginatedResponse_PatientResponse_'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
     post:
       tags:
       - Patients
       summary: Create Patient
       operationId: create_patient_patients_post
+      security:
+      - HTTPBearer: []
       requestBody:
+        required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PatientCreate'
-        required: true
       responses:
         '201':
           description: Successful Response
@@ -223,8 +414,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-      security:
-      - HTTPBearer: []
   /patients/{patient_id}:
     get:
       tags:
@@ -318,6 +507,23 @@ paths:
       security:
       - HTTPBearer: []
       parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Limit
       - name: status
         in: query
         required: false
@@ -334,16 +540,57 @@ paths:
           - type: integer
           - type: 'null'
           title: Assigned Doctor Id
+      - name: patient_id
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Patient Id
+      - name: priority
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+            maximum: 5
+            minimum: 1
+          - type: 'null'
+          title: Priority
+      - name: date_from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date From
+      - name: date_to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date
+          - type: 'null'
+          title: Date To
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PatientRequestResponse'
-                title: Response List Requests Requests Get
+                $ref: '#/components/schemas/PaginatedResponse_PatientRequestResponse_'
         '422':
           description: Validation Error
           content:
@@ -552,6 +799,23 @@ paths:
       security:
       - HTTPBearer: []
       parameters:
+      - name: page
+        in: query
+        required: false
+        schema:
+          type: integer
+          minimum: 1
+          default: 1
+          title: Page
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          maximum: 100
+          minimum: 1
+          default: 20
+          title: Limit
       - name: user_id
         in: query
         required: false
@@ -568,16 +832,47 @@ paths:
           - type: string
           - type: 'null'
           title: Entity Type
+      - name: action
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Action
+      - name: date_from
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date From
+      - name: date_to
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Date To
+      - name: search
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Search
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AuditLogResponse'
-                title: Response List Audit Logs Audit Logs Get
+                $ref: '#/components/schemas/PaginatedResponse_AuditLogResponse_'
         '422':
           description: Validation Error
           content:
@@ -603,6 +898,14 @@ components:
         user_id:
           type: integer
           title: User Id
+        user_full_name:
+          type: string
+          title: User Full Name
+        ip_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ip Address
         action:
           type: string
           title: Action
@@ -624,12 +927,28 @@ components:
       required:
       - id
       - user_id
+      - user_full_name
+      - ip_address
       - action
       - entity_type
       - entity_id
       - details
       - timestamp
       title: AuditLogResponse
+    ChangePasswordRequest:
+      properties:
+        current_password:
+          type: string
+          title: Current Password
+        new_password:
+          type: string
+          minLength: 6
+          title: New Password
+      type: object
+      required:
+      - current_password
+      - new_password
+      title: ChangePasswordRequest
     ChangeStatusRequest:
       properties:
         status:
@@ -656,6 +975,9 @@ components:
         requests_closed:
           type: integer
           title: Requests Closed
+        requests_closed_today:
+          type: integer
+          title: Requests Closed Today
       type: object
       required:
       - total_patients
@@ -663,6 +985,7 @@ components:
       - requests_new
       - requests_in_progress
       - requests_closed
+      - requests_closed_today
       title: DashboardStats
     HTTPValidationError:
       properties:
@@ -673,6 +996,42 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    LoginEventResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        user_id:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: User Id
+        timestamp:
+          type: string
+          format: date-time
+          title: Timestamp
+        ip_address:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ip Address
+        user_agent:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: User Agent
+        success:
+          type: boolean
+          title: Success
+      type: object
+      required:
+      - id
+      - user_id
+      - timestamp
+      - ip_address
+      - user_agent
+      - success
+      title: LoginEventResponse
     LoginRequest:
       properties:
         email:
@@ -686,6 +1045,107 @@ components:
       - email
       - password
       title: LoginRequest
+    MessageResponse:
+      properties:
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - message
+      title: MessageResponse
+    PaginatedResponse_AuditLogResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/AuditLogResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      title: PaginatedResponse[AuditLogResponse]
+    PaginatedResponse_PatientRequestResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PatientRequestResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      title: PaginatedResponse[PatientRequestResponse]
+    PaginatedResponse_PatientResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/PatientResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      title: PaginatedResponse[PatientResponse]
+    PaginatedResponse_UserResponse_:
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/UserResponse'
+          type: array
+          title: Items
+        total:
+          type: integer
+          title: Total
+        page:
+          type: integer
+          title: Page
+        limit:
+          type: integer
+          title: Limit
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      title: PaginatedResponse[UserResponse]
     PatientCreate:
       properties:
         full_name:
@@ -746,6 +1206,9 @@ components:
         patient_id:
           type: integer
           title: Patient Id
+        patient_full_name:
+          type: string
+          title: Patient Full Name
         title:
           type: string
           title: Title
@@ -763,6 +1226,11 @@ components:
           - type: integer
           - type: 'null'
           title: Assigned Doctor Id
+        assigned_doctor_full_name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Assigned Doctor Full Name
         created_by_id:
           type: integer
           title: Created By Id
@@ -778,11 +1246,13 @@ components:
       required:
       - id
       - patient_id
+      - patient_full_name
       - title
       - description
       - status
       - priority
       - assigned_doctor_id
+      - assigned_doctor_full_name
       - created_by_id
       - created_at
       - updated_at
@@ -917,6 +1387,17 @@ components:
       - access_token
       - refresh_token
       title: TokenPair
+    UpdateProfileRequest:
+      properties:
+        full_name:
+          type: string
+          maxLength: 255
+          minLength: 2
+          title: Full Name
+      type: object
+      required:
+      - full_name
+      title: UpdateProfileRequest
     UserCreate:
       properties:
         email:

@@ -84,3 +84,5 @@ CRM-система для регистрации и обработки запр�
 	- `alembic upgrade head`
 3. Запустить API:
 	- `python run.py`
+
+Примечание: метрика `requests_closed_today` в Dashboard считается по границам текущих суток в UTC.

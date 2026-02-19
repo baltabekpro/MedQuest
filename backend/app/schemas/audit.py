@@ -8,6 +8,8 @@ class AuditLogResponse(BaseModel):
 
     id: int
     user_id: int
+    user_full_name: str
+    ip_address: str | None
     action: str
     entity_type: str
     entity_id: int

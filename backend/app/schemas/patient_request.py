@@ -31,11 +31,13 @@ class PatientRequestResponse(BaseModel):
 
     id: int
     patient_id: int
+    patient_full_name: str
     title: str
     description: str
     status: str
     priority: int
     assigned_doctor_id: int | None
+    assigned_doctor_full_name: str | None
     created_by_id: int
     created_at: datetime
     updated_at: datetime
