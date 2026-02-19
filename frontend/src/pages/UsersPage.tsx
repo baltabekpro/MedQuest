@@ -29,16 +29,16 @@ export const UsersPage = () => {
 
   return (
     <Card>
-      <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
+      <div className='mb-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between'>
         <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
-          <TabsList>
+          <TabsList className='w-full flex-wrap sm:w-auto'>
             <TabsTrigger value='all'>Все</TabsTrigger><TabsTrigger value='admin'>Администраторы</TabsTrigger><TabsTrigger value='registrar'>Регистраторы</TabsTrigger><TabsTrigger value='doctor'>Врачи</TabsTrigger>
           </TabsList>
         </Tabs>
-        <Button onClick={() => { setEditingUser(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пользователя</Button>
+        <Button className='w-full sm:w-auto' onClick={() => { setEditingUser(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пользователя</Button>
       </div>
-      <Input className='mb-4 max-w-sm' placeholder='Поиск по ФИО или email...' value={search} onChange={(e) => setSearch(e.target.value)} />
-      <Table>
+      <Input className='mb-4 w-full sm:max-w-sm' placeholder='Поиск по ФИО или email...' value={search} onChange={(e) => setSearch(e.target.value)} />
+      <Table className='min-w-[860px]'>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Email</TableHead><TableHead>Роль</TableHead><TableHead>Статус</TableHead><TableHead>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (

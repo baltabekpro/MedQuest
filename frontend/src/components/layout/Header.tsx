@@ -1,4 +1,4 @@
-import { Bell } from 'lucide-react'
+import { Bell, Menu } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotificationMutations, useNotifications } from '@/hooks/useNotifications'
@@ -6,9 +6,10 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 interface HeaderProps {
   title: string
+  onMenuClick?: () => void
 }
 
-export const Header = ({ title }: HeaderProps) => {
+export const Header = ({ title, onMenuClick }: HeaderProps) => {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [onlyUnread, setOnlyUnread] = useState(false)
@@ -24,10 +25,20 @@ export const Header = ({ title }: HeaderProps) => {
   )
 
   return (
-    <header className='flex items-center justify-between border-b border-border bg-white px-6 py-4'>
-      <div>
-        <h1 className='text-xl font-semibold'>{title}</h1>
-        <p className='text-sm text-muted'>{new Date().toLocaleDateString('ru-RU', { dateStyle: 'full' })}</p>
+    <header className='flex items-center justify-between border-b border-border bg-white px-3 py-3 sm:px-6 sm:py-4'>
+      <div className='flex min-w-0 items-center gap-2 sm:gap-3'>
+        <button
+          type='button'
+          aria-label='Открыть меню'
+          className='rounded-md p-2 text-muted hover:bg-slate-100 md:hidden'
+          onClick={onMenuClick}
+        >
+          <Menu className='h-5 w-5' />
+        </button>
+        <div className='min-w-0'>
+          <h1 className='truncate text-base font-semibold sm:text-xl'>{title}</h1>
+          <p className='hidden text-sm text-muted sm:block'>{new Date().toLocaleDateString('ru-RU', { dateStyle: 'full' })}</p>
+        </div>
       </div>
 
       <Popover open={open} onOpenChange={setOpen}>

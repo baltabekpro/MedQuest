@@ -8,7 +8,9 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+ssh-key-1770638448815
 build/
+ssh-key-1770638448815.pub
 develop-eggs/
 dist/
 downloads/

@@ -7,7 +7,7 @@ export const PopoverContent = ({ className = '', sideOffset = 8, ...props }: Pop
   <PopoverPrimitive.Portal>
     <PopoverPrimitive.Content
       sideOffset={sideOffset}
-      className={`z-50 w-96 rounded-xl border border-border bg-white p-3 shadow-lg outline-none ${className}`}
+      className={`z-50 w-[min(24rem,calc(100vw-1rem))] rounded-xl border border-border bg-white p-3 shadow-lg outline-none ${className}`}
       {...props}
     />
   </PopoverPrimitive.Portal>

@@ -11,3 +11,72 @@ body {
 #root {
   min-height: 100vh;
 }
+
+@keyframes mqFloatA {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(30px, -20px, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mqFloatB {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-26px, 22px, 0) scale(0.92);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mqBreath {
+  0% {
+    opacity: 0.24;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.42;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.24;
+    transform: scale(0.96);
+  }
+}
+
+@keyframes mqShimmer {
+  0% {
+    transform: translateX(-35%);
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.28;
+  }
+  100% {
+    transform: translateX(35%);
+    opacity: 0.15;
+  }
+}
+
+.mq-hero-orb-a {
+  animation: mqFloatA 16s ease-in-out infinite;
+}
+
+.mq-hero-orb-b {
+  animation: mqFloatB 19s ease-in-out infinite;
+}
+
+.mq-hero-shimmer {
+  animation: mqShimmer 12s ease-in-out infinite alternate;
+}
+
+.mq-hero-breath {
+  animation: mqBreath 9s ease-in-out infinite;
+}

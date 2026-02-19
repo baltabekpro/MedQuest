@@ -70,7 +70,7 @@ export const AuditPage = () => {
           <Input placeholder='Введите текст для поиска...' value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
-      <div className='mb-4 flex justify-between gap-2'>
+      <div className='mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
         <Button
           variant='outline'
           onClick={() => {
@@ -84,11 +84,11 @@ export const AuditPage = () => {
         >
           Сбросить фильтры
         </Button>
-        <a href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`} download='audit.csv'>
+        <a href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`} download='audit.csv' className='w-full sm:w-auto'>
           <Button variant='outline'><Download className='mr-2 h-4 w-4' />Экспорт CSV</Button>
         </a>
       </div>
-      <Table>
+      <Table className='min-w-[920px]'>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Дата+время</TableHead><TableHead>Пользователь</TableHead><TableHead>Действие</TableHead><TableHead>Сущность</TableHead><TableHead>Описание</TableHead><TableHead>IP</TableHead></TableRow></TableHeader>
         <TableBody>
           {auditQuery.isLoading && (

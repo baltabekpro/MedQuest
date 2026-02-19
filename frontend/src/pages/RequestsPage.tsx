@@ -140,7 +140,7 @@ export const RequestsPage = () => {
               <p className='text-xl font-semibold'>{myHistoryQuery.data?.total ?? 0}</p>
             </div>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex flex-wrap gap-2'>
             <Button variant={doctorMode === 'all' ? 'default' : 'outline'} size='sm' onClick={() => { setDoctorMode('all'); setPage(1) }}>
               Все запросы
             </Button>
@@ -197,8 +197,8 @@ export const RequestsPage = () => {
           <DatePicker value={dateTo} onChange={(v) => { setDateTo(v); setPage(1) }} placeholder='ДД.ММ.ГГГГ' />
         </div>
       </div>
-      <div className='mb-4 flex justify-between gap-2'>
-        <div className='flex gap-2'>
+      <div className='mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <div className='flex flex-wrap gap-2'>
           <Button
             variant='outline'
             onClick={() => {
@@ -218,9 +218,9 @@ export const RequestsPage = () => {
             <Button variant='outline'><Download className='mr-2 h-4 w-4' />Экспорт CSV</Button>
           </a>
         </div>
-        <Button onClick={() => { setEditing(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Создать запрос</Button>
+        <Button className='w-full sm:w-auto' onClick={() => { setEditing(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Создать запрос</Button>
       </div>
-      <Table>
+      <Table className='min-w-[960px]'>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Пациент</TableHead><TableHead>Заголовок</TableHead><TableHead>Описание</TableHead><TableHead>Статус</TableHead><TableHead>Приоритет</TableHead><TableHead>Врач</TableHead><TableHead>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (
@@ -250,7 +250,7 @@ export const RequestsPage = () => {
           ))}
         </TableBody>
       </Table>
-      <div className='mt-4 flex items-center justify-between gap-2 text-sm text-muted'>
+      <div className='mt-4 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:items-center sm:justify-between'>
         <span>Показано {from}–{to} из {total}</span>
         <div className='flex gap-2'>
         <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Назад</Button>

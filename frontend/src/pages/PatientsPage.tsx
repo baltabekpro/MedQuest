@@ -41,11 +41,11 @@ export const PatientsPage = () => {
 
   return (
     <Card>
-      <div className='mb-4 flex flex-wrap items-center justify-between gap-2'>
-        <Input className='max-w-sm' placeholder='Поиск пациентов...' value={search} onChange={(e) => setSearch(e.target.value)} />
-        <Button onClick={() => { setEditingPatient(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пациента</Button>
+      <div className='mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
+        <Input className='w-full sm:max-w-sm' placeholder='Поиск пациентов...' value={search} onChange={(e) => setSearch(e.target.value)} />
+        <Button className='w-full sm:w-auto' onClick={() => { setEditingPatient(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пациента</Button>
       </div>
-      <Table>
+      <Table className='min-w-[980px]'>
         <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Дата рождения</TableHead><TableHead>Телефон</TableHead><TableHead>Email</TableHead><TableHead>Адрес</TableHead><TableHead>Дата регистрации</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (
@@ -94,7 +94,7 @@ export const PatientsPage = () => {
           ))}
         </TableBody>
       </Table>
-      <div className='mt-4 flex items-center justify-between text-sm text-muted'>
+      <div className='mt-4 flex flex-col gap-2 text-sm text-muted sm:flex-row sm:items-center sm:justify-between'>
         <span>Показано {from}–{to} из {total}</span>
         <div className='space-x-2'>
           <Button variant='outline' size='sm' disabled={page === 1} onClick={() => setPage((p) => p - 1)}>Назад</Button>

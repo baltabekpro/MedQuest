@@ -13,12 +13,17 @@ const links = [
   { to: '/audit', label: 'Аудит', icon: ClipboardList, adminOnly: true },
 ]
 
-export const Sidebar = () => {
+interface SidebarProps {
+  className?: string
+  onNavigate?: () => void
+}
+
+export const Sidebar = ({ className = '', onNavigate }: SidebarProps) => {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
 
   return (
-    <aside className='flex h-screen w-64 flex-col border-r border-border bg-sidebar p-4'>
+    <aside className={cn('flex h-screen w-64 shrink-0 flex-col border-r border-border bg-sidebar p-4', className)}>
       <div className='mb-8 flex items-center gap-2 text-primary'>
         <img src='/medquest-icon.svg' alt='MedQuest' className='h-8 w-8 rounded-md' />
         <span className='text-lg font-semibold'>MedQuest</span>
@@ -30,6 +35,7 @@ export const Sidebar = () => {
             <NavLink
               key={to}
               to={to}
+              onClick={onNavigate}
               className={({ isActive }) => cn('flex items-center gap-2 rounded-md px-3 py-2 text-sm', isActive ? 'bg-blue-100 text-primary' : 'text-muted hover:bg-slate-100')}
             >
               <Icon className='h-4 w-4' />
@@ -46,6 +52,7 @@ export const Sidebar = () => {
           onClick={() => {
             logout()
             navigate('/login')
+            onNavigate?.()
           }}
         >
           <LogOut className='h-4 w-4' /> Выход

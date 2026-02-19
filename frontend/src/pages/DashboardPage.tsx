@@ -44,7 +44,7 @@ export const DashboardPage = () => {
           <h2 className='mb-3 text-lg font-semibold'>
             {user?.role === 'doctor' ? 'Мои последние запросы' : 'Последние запросы'}
           </h2>
-          <Table>
+          <Table className='min-w-[700px]'>
             <TableHeader>
               <TableRow>
                 <TableHead>№</TableHead><TableHead>Пациент</TableHead><TableHead>Заголовок</TableHead><TableHead>Статус</TableHead><TableHead>Дата</TableHead>
@@ -93,11 +93,11 @@ export const DashboardPage = () => {
         </Card>
       </div>
       <Card>
-        <div className='mb-3 flex items-baseline justify-between gap-2'>
+        <div className='mb-3 flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2'>
           <h2 className='text-lg font-semibold'>Активность за неделю</h2>
           <span className='text-sm text-muted'>Всего: <b>{activityTotal}</b></span>
         </div>
-        <div className='mb-3 flex gap-2'>
+        <div className='mb-3 grid grid-cols-3 gap-2'>
           {[7, 14, 30].map((d) => (
             <button
               key={d}

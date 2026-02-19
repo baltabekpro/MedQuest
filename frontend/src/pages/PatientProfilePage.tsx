@@ -39,11 +39,11 @@ export const PatientProfilePage = () => {
           </div>
         </Card>
         <Card>
-          <div className='mb-4 flex items-center justify-between'>
+          <div className='mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between'>
             <h2 className='text-lg font-semibold'>История запросов</h2>
-            <Button size='sm' onClick={() => setRequestModal(true)}><Plus className='mr-1 h-4 w-4' />Создать запрос</Button>
+            <Button size='sm' className='w-full sm:w-auto' onClick={() => setRequestModal(true)}><Plus className='mr-1 h-4 w-4' />Создать запрос</Button>
           </div>
-          <Table>
+          <Table className='min-w-[520px]'>
             <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Заголовок</TableHead><TableHead>Статус</TableHead></TableRow></TableHeader>
             <TableBody>
               {(requestsQuery.data?.items ?? []).map((request) => (
