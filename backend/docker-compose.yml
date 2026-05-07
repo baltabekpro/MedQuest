@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    container_name: medquest_app
+    restart: unless-stopped
+    environment:
+      - ROOT_PATH=/medquest
+      - DATABASE_URL=sqlite:////app/data/medquest.db
+      - SECRET_KEY=${SECRET_KEY}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
+    volumes:
+      - medquest_data:/app/data
+    networks:
+      - edustream_default
+
+networks:
+  edustream_default:
+    external: true
+
+volumes:
+  medquest_data:

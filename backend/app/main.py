@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -19,11 +20,19 @@ async def lifespan(_: FastAPI):
     yield
 
 
-app = FastAPI(title=settings.app_name, version="1.0.0", lifespan=lifespan)
+app = FastAPI(
+    title=settings.app_name,
+    version="1.0.0",
+    lifespan=lifespan,
+    root_path=os.getenv("ROOT_PATH", ""),
+)
+
+_extra_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", *_extra_origins],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -32,6 +41,11 @@ app.add_middleware(
 @app.get("/health", tags=["Dashboard"])
 def health():
     return {"status": "ok"}
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    return {"status": "ok", "service": "medquest-backend", "docs": "/docs"}
 
 
 app.include_router(auth.router)
@@ -52,17 +66,20 @@ def seed_admin_user() -> None:
             db.commit()
 
         def ensure_user(*, email: str, full_name: str, role: str, password: str) -> None:
-            existing = db.query(User).filter(User.email == email).first()
-            if existing:
-                return
-            user = User(
-                email=email,
-                full_name=full_name,
-                role=role,
-                hashed_password=get_password_hash(password),
-                is_active=True,
+            from sqlalchemy.dialects.sqlite import insert as sqlite_insert
+            from sqlalchemy import inspect as sa_inspect
+            stmt = (
+                sqlite_insert(User)
+                .values(
+                    email=email,
+                    full_name=full_name,
+                    role=role,
+                    hashed_password=get_password_hash(password),
+                    is_active=True,
+                )
+                .on_conflict_do_nothing(index_elements=["email"])
             )
-            db.add(user)
+            db.execute(stmt)
             db.commit()
 
         ensure_user(

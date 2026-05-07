@@ -21,7 +21,7 @@ def create_token(subject: str, expires_delta: timedelta, token_type: str) -> str
     payload = {
         "sub": subject,
         "type": token_type,
-        "iat": int(now.timestamp()),
+        "iat": int(now.timestamp()), 
         "exp": int((now + expires_delta).timestamp()),
     }
     return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
