@@ -1,0 +1,70 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "MedQuest" [ref=e6]
+        - generic [ref=e7]: MedQuest
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e10]
+          - text: Dashboard
+        - link "Пациенты" [ref=e15] [cursor=pointer]:
+          - /url: /patients
+          - img [ref=e16]
+          - text: Пациенты
+        - link "Запросы" [ref=e21] [cursor=pointer]:
+          - /url: /requests
+          - img [ref=e22]
+          - text: Запросы
+        - link "Мой профиль" [ref=e25] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e26]
+          - text: Мой профиль
+        - link "Пользователи" [ref=e29] [cursor=pointer]:
+          - /url: /users
+          - img [ref=e30]
+          - text: Пользователи
+        - link "Аудит" [ref=e42] [cursor=pointer]:
+          - /url: /audit
+          - img [ref=e43]
+          - text: Аудит
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: System Administrator
+        - paragraph [ref=e48]: Администратор
+        - button "Выход" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Выход
+    - generic [ref=e53]:
+      - banner [ref=e54]:
+        - generic [ref=e56]:
+          - heading "Пользователи" [level=1] [ref=e57]
+          - paragraph [ref=e58]: четверг, 7 мая 2026 г.
+        - button "Уведомления" [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+      - main [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - tablist [ref=e67]:
+              - tab "Все" [selected] [ref=e68] [cursor=pointer]
+              - tab "Администраторы" [ref=e69] [cursor=pointer]
+              - tab "Регистраторы" [ref=e70] [cursor=pointer]
+              - tab "Врачи" [ref=e71] [cursor=pointer]
+            - button "Добавить пользователя" [ref=e72] [cursor=pointer]:
+              - img [ref=e73]
+              - text: Добавить пользователя
+          - textbox "Поиск по ФИО или email..." [ref=e74]
+          - table [ref=e76]:
+            - rowgroup [ref=e77]:
+              - row "ID ФИО Email Роль Статус Дата Действия" [ref=e78]:
+                - columnheader "ID" [ref=e79]
+                - columnheader "ФИО" [ref=e80]
+                - columnheader "Email" [ref=e81]
+                - columnheader "Роль" [ref=e82]
+                - columnheader "Статус" [ref=e83]
+                - columnheader "Дата" [ref=e84]
+                - columnheader "Действия" [ref=e85]
+            - rowgroup [ref=e86]:
+              - row "Загрузка пользователей..." [ref=e87]:
+                - cell "Загрузка пользователей..." [ref=e88]
+  - region "Notifications alt+T"

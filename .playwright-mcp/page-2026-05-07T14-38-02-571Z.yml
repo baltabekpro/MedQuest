@@ -1,0 +1,158 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - img
+          - generic: MedQuest
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link:
+            - /url: /patients
+            - img
+            - text: Пациенты
+          - link:
+            - /url: /requests
+            - img
+            - text: Запросы
+          - link:
+            - /url: /profile
+            - img
+            - text: Мой профиль
+          - link:
+            - /url: /users
+            - img
+            - text: Пользователи
+          - link:
+            - /url: /audit
+            - img
+            - text: Аудит
+        - generic:
+          - paragraph: System Administrator
+          - paragraph: Администратор
+          - button:
+            - img
+            - text: Выход
+      - generic:
+        - banner:
+          - generic:
+            - generic:
+              - heading [level=1]: Пользователи
+              - paragraph: четверг, 7 мая 2026 г.
+          - button:
+            - img
+            - generic: "1"
+        - main:
+          - generic:
+            - generic:
+              - generic:
+                - tablist:
+                  - tab [selected]: Все
+                  - tab: Администраторы
+                  - tab: Регистраторы
+                  - tab: Врачи
+              - button:
+                - img
+                - text: Добавить пользователя
+            - textbox:
+              - /placeholder: Поиск по ФИО или email...
+            - generic:
+              - table:
+                - rowgroup:
+                  - row:
+                    - columnheader: ID
+                    - columnheader: ФИО
+                    - columnheader: Email
+                    - columnheader: Роль
+                    - columnheader: Статус
+                    - columnheader: Дата
+                    - columnheader: Действия
+                - rowgroup:
+                  - row:
+                    - cell: "3"
+                    - cell: Doctor Demo
+                    - cell: doctor@medquest.kz
+                    - cell:
+                      - generic: Врач
+                    - cell:
+                      - generic: Активен
+                    - cell: 07.05.2026
+                    - cell:
+                      - generic:
+                        - button:
+                          - img
+                        - button:
+                          - img
+                  - row:
+                    - cell: "2"
+                    - cell: Registrar Demo
+                    - cell: registrar@medquest.kz
+                    - cell:
+                      - generic: Регистратор
+                    - cell:
+                      - generic: Активен
+                    - cell: 07.05.2026
+                    - cell:
+                      - generic:
+                        - button:
+                          - img
+                        - button:
+                          - img
+                  - row:
+                    - cell: "1"
+                    - cell: System Administrator
+                    - cell: admin@medquest.kz
+                    - cell:
+                      - generic: Администратор
+                    - cell:
+                      - generic: Активен
+                    - cell: 07.05.2026
+                    - cell:
+                      - generic:
+                        - button:
+                          - img
+                        - button:
+                          - img
+    - region "Notifications alt+T"
+  - dialog:
+    - heading [level=2]: Добавить пользователя
+    - generic:
+      - generic:
+        - generic: ФИО
+        - textbox:
+          - /placeholder: ФИО
+          - text: Dr. Иван Петров
+      - generic:
+        - generic: Email
+        - textbox:
+          - /placeholder: Email
+          - text: ivan.petrov@medquest.kz
+      - generic:
+        - generic: Роль пользователя
+        - combobox [expanded]:
+          - generic: Регистратор
+          - img
+        - combobox
+      - generic:
+        - generic: Пароль
+        - textbox:
+          - /placeholder: Пароль
+      - generic:
+        - generic: Подтверждение пароля
+        - textbox:
+          - /placeholder: Подтвердить пароль
+      - generic:
+        - checkbox [checked]
+        - text: Активен
+      - button: Создать
+  - listbox [ref=e172]:
+    - option "Администратор" [ref=e173]:
+      - generic [ref=e175]: Администратор
+    - option "Регистратор" [active] [selected] [ref=e176]:
+      - img [ref=e179]
+      - generic [ref=e181]: Регистратор
+    - option "Врач" [ref=e182]:
+      - generic [ref=e184]: Врач

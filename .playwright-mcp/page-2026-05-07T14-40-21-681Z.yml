@@ -1,0 +1,120 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "MedQuest" [ref=e6]
+        - generic [ref=e7]: MedQuest
+      - navigation [ref=e8]:
+        - link "Dashboard" [ref=e9] [cursor=pointer]:
+          - /url: /dashboard
+          - img [ref=e10]
+          - text: Dashboard
+        - link "Пациенты" [ref=e15] [cursor=pointer]:
+          - /url: /patients
+          - img [ref=e16]
+          - text: Пациенты
+        - link "Запросы" [ref=e21] [cursor=pointer]:
+          - /url: /requests
+          - img [ref=e22]
+          - text: Запросы
+        - link "Мой профиль" [ref=e25] [cursor=pointer]:
+          - /url: /profile
+          - img [ref=e26]
+          - text: Мой профиль
+        - link "Пользователи" [ref=e29] [cursor=pointer]:
+          - /url: /users
+          - img [ref=e30]
+          - text: Пользователи
+        - link "Аудит" [ref=e42] [cursor=pointer]:
+          - /url: /audit
+          - img [ref=e43]
+          - text: Аудит
+      - generic [ref=e46]:
+        - paragraph [ref=e47]: System Administrator
+        - paragraph [ref=e48]: Администратор
+        - button "Выход" [ref=e49] [cursor=pointer]:
+          - img [ref=e50]
+          - text: Выход
+    - generic [ref=e53]:
+      - banner [ref=e54]:
+        - generic [ref=e56]:
+          - heading "Пациенты" [level=1] [ref=e57]
+          - paragraph [ref=e58]: четверг, 7 мая 2026 г.
+        - button "Уведомления" [ref=e59] [cursor=pointer]:
+          - img [ref=e60]
+          - generic [ref=e87]: "3"
+      - main [ref=e63]:
+        - generic [ref=e64]:
+          - generic [ref=e65]:
+            - textbox "Поиск пациентов..." [ref=e66]
+            - button "Добавить пациента" [ref=e67] [cursor=pointer]:
+              - img [ref=e68]
+              - text: Добавить пациента
+          - table [ref=e70]:
+            - rowgroup [ref=e71]:
+              - row "ID ФИО Дата рождения Телефон Email Адрес Дата регистрации Действия" [ref=e72]:
+                - columnheader "ID" [ref=e73]
+                - columnheader "ФИО" [ref=e74]
+                - columnheader "Дата рождения" [ref=e75]
+                - columnheader "Телефон" [ref=e76]
+                - columnheader "Email" [ref=e77]
+                - columnheader "Адрес" [ref=e78]
+                - columnheader "Дата регистрации" [ref=e79]
+                - columnheader "Действия" [ref=e80]
+            - rowgroup [ref=e81]:
+              - row "2 Мария Вишневская 07.05.2026 +7 (777) 987-65-43 maria.vishnevskaya@email.com г. Алматы, пр. Хусаина Абдулина, дом 1 07.05.2026 Просмотр Скопировать телефон Скопировать email Редактировать Удалить" [ref=e277]:
+                - cell "2" [ref=e278]
+                - cell "Мария Вишневская" [ref=e279]:
+                  - link "Мария Вишневская" [ref=e280] [cursor=pointer]:
+                    - /url: /patients/2
+                - cell "07.05.2026" [ref=e281]
+                - cell "+7 (777) 987-65-43" [ref=e282]
+                - cell "maria.vishnevskaya@email.com" [ref=e283]
+                - cell "г. Алматы, пр. Хусаина Абдулина, дом 1" [ref=e284]
+                - cell "07.05.2026" [ref=e285]
+                - cell "Просмотр Скопировать телефон Скопировать email Редактировать Удалить" [ref=e286]:
+                  - generic [ref=e287]:
+                    - link "Просмотр" [ref=e288] [cursor=pointer]:
+                      - /url: /patients/2
+                      - img [ref=e289]
+                    - button "Скопировать телефон" [ref=e292] [cursor=pointer]:
+                      - img [ref=e293]
+                    - button "Скопировать email" [ref=e296] [cursor=pointer]:
+                      - img [ref=e297]
+                    - button "Редактировать" [ref=e300] [cursor=pointer]:
+                      - img [ref=e301]
+                    - button "Удалить" [ref=e304] [cursor=pointer]:
+                      - img [ref=e305]
+              - row "1 Александр Сидоров 07.05.2026 +7 (777) 123-45-67 alex.sidorov@email.com г. Алматы, ул. Мира 42, квартира 15 07.05.2026 Просмотр Скопировать телефон Скопировать email Редактировать Удалить" [ref=e213]:
+                - cell "1" [ref=e214]
+                - cell "Александр Сидоров" [ref=e215]:
+                  - link "Александр Сидоров" [ref=e216] [cursor=pointer]:
+                    - /url: /patients/1
+                - cell "07.05.2026" [ref=e217]
+                - cell "+7 (777) 123-45-67" [ref=e218]
+                - cell "alex.sidorov@email.com" [ref=e219]
+                - cell "г. Алматы, ул. Мира 42, квартира 15" [ref=e220]
+                - cell "07.05.2026" [ref=e221]
+                - cell "Просмотр Скопировать телефон Скопировать email Редактировать Удалить" [ref=e222]:
+                  - generic [ref=e223]:
+                    - link "Просмотр" [ref=e224] [cursor=pointer]:
+                      - /url: /patients/1
+                      - img [ref=e225]
+                    - button "Скопировать телефон" [ref=e228] [cursor=pointer]:
+                      - img [ref=e229]
+                    - button "Скопировать email" [ref=e232] [cursor=pointer]:
+                      - img [ref=e233]
+                    - button "Редактировать" [ref=e236] [cursor=pointer]:
+                      - img [ref=e237]
+                    - button "Удалить" [ref=e240] [cursor=pointer]:
+                      - img [ref=e241]
+          - generic [ref=e84]:
+            - generic [ref=e85]: Показано 1–2 из 2
+            - generic [ref=e86]:
+              - button "Назад" [disabled]
+              - button "Вперед" [disabled]
+  - region "Notifications alt+T":
+    - list:
+      - listitem [ref=e308]:
+        - img [ref=e310]
+        - generic [ref=e313]: Пациент добавлен

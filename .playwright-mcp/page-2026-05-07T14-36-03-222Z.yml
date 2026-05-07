@@ -1,0 +1,98 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - img
+          - generic: MedQuest
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link:
+            - /url: /patients
+            - img
+            - text: Пациенты
+          - link:
+            - /url: /requests
+            - img
+            - text: Запросы
+          - link:
+            - /url: /profile
+            - img
+            - text: Мой профиль
+          - link:
+            - /url: /users
+            - img
+            - text: Пользователи
+          - link:
+            - /url: /audit
+            - img
+            - text: Аудит
+        - generic:
+          - paragraph: System Administrator
+          - paragraph: Администратор
+          - button:
+            - img
+            - text: Выход
+      - generic:
+        - banner:
+          - generic:
+            - generic:
+              - heading [level=1]: Пациенты
+              - paragraph: четверг, 7 мая 2026 г.
+          - button:
+            - img
+            - generic: "1"
+        - main:
+          - generic:
+            - generic:
+              - textbox:
+                - /placeholder: Поиск пациентов...
+              - button:
+                - img
+                - text: Добавить пациента
+            - generic:
+              - table:
+                - rowgroup:
+                  - row:
+                    - columnheader: ID
+                    - columnheader: ФИО
+                    - columnheader: Дата рождения
+                    - columnheader: Телефон
+                    - columnheader: Email
+                    - columnheader: Адрес
+                    - columnheader: Дата регистрации
+                    - columnheader: Действия
+                - rowgroup:
+                  - row:
+                    - cell: Пациенты не найдены
+            - generic:
+              - generic: Показано 0–0 из 0
+              - generic:
+                - button [disabled]: Назад
+                - button [disabled]: Вперед
+    - region "Notifications alt+T"
+  - dialog "Добавить пациента" [ref=e91]:
+    - heading "Добавить пациента" [level=2] [ref=e92]
+    - generic [ref=e93]:
+      - generic [ref=e94]:
+        - generic [ref=e95]: ФИО пациента
+        - textbox "Иванов Иван Иванович" [active] [ref=e96]
+      - generic [ref=e97]:
+        - generic [ref=e98]: Дата рождения
+        - button "ДД.ММ.ГГГГ" [ref=e100] [cursor=pointer]:
+          - generic [ref=e101]:
+            - img [ref=e102]
+            - text: ДД.ММ.ГГГГ
+      - generic [ref=e104]:
+        - generic [ref=e105]: Номер телефона
+        - textbox "+7 (777) 777-77-77" [ref=e106]
+      - generic [ref=e107]:
+        - generic [ref=e108]: Email (необязательно)
+        - textbox "example@mail.com" [ref=e109]
+      - generic [ref=e110]:
+        - generic [ref=e111]: Адрес (необязательно)
+        - textbox "г. Алматы, ул. Абая 1" [ref=e112]
+      - button "Сохранить" [ref=e113] [cursor=pointer]

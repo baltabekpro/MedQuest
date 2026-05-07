@@ -1,0 +1,148 @@
+- generic:
+  - generic:
+    - generic:
+      - complementary:
+        - generic:
+          - img
+          - generic: MedQuest
+        - navigation:
+          - link:
+            - /url: /dashboard
+            - img
+            - text: Dashboard
+          - link:
+            - /url: /patients
+            - img
+            - text: Пациенты
+          - link:
+            - /url: /requests
+            - img
+            - text: Запросы
+          - link:
+            - /url: /profile
+            - img
+            - text: Мой профиль
+          - link:
+            - /url: /users
+            - img
+            - text: Пользователи
+          - link:
+            - /url: /audit
+            - img
+            - text: Аудит
+        - generic:
+          - paragraph: System Administrator
+          - paragraph: Администратор
+          - button:
+            - img
+            - text: Выход
+      - generic:
+        - banner:
+          - generic:
+            - generic:
+              - heading [level=1]: Запросы
+              - paragraph: четверг, 7 мая 2026 г.
+          - button:
+            - img
+            - generic: "4"
+        - main:
+          - generic:
+            - generic:
+              - generic:
+                - generic: Поиск
+                - textbox:
+                  - /placeholder: Введите текст для поиска...
+              - generic:
+                - generic: Статус
+                - combobox:
+                  - generic: Выберите статус...
+                  - img
+              - generic:
+                - generic: Приоритет
+                - combobox:
+                  - generic: Выберите приоритет...
+                  - img
+              - generic:
+                - generic: Врач
+                - combobox:
+                  - generic: Выберите врача...
+                  - img
+              - generic:
+                - generic: Дата от
+                - generic:
+                  - button:
+                    - generic:
+                      - img
+                      - text: ДД.ММ.ГГГГ
+              - generic:
+                - generic: Дата до
+                - generic:
+                  - button:
+                    - generic:
+                      - img
+                      - text: ДД.ММ.ГГГГ
+            - generic:
+              - generic:
+                - button: Сбросить
+                - link:
+                  - /url: data:text/csv;charset=utf-8,%22ID%22%2C%22%D0%9F%D0%B0%D1%86%D0%B8%D0%B5%D0%BD%D1%82%22%2C%22%D0%97%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BE%D0%BA%22%2C%22%D0%9E%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D0%B5%22%2C%22%D0%A1%D1%82%D0%B0%D1%82%D1%83%D1%81%22%2C%22%D0%9F%D1%80%D0%B8%D0%BE%D1%80%D0%B8%D1%82%D0%B5%D1%82%22%2C%22%D0%92%D1%80%D0%B0%D1%87%22%2C%22%D0%94%D0%B0%D1%82%D0%B0%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D1%8F%22
+                  - button:
+                    - img
+                    - text: Экспорт CSV
+              - button:
+                - img
+                - text: Создать запрос
+            - generic:
+              - table:
+                - rowgroup:
+                  - row:
+                    - columnheader: ID
+                    - columnheader: Пациент
+                    - columnheader: Заголовок
+                    - columnheader: Описание
+                    - columnheader: Статус
+                    - columnheader: Приоритет
+                    - columnheader: Врач
+                    - columnheader: Дата
+                    - columnheader: Действия
+                - rowgroup:
+                  - row:
+                    - cell: По выбранным фильтрам ничего не найдено
+            - generic:
+              - generic: Показано 0–0 из 0
+              - generic:
+                - button [disabled]: Назад
+                - button [disabled]: Вперед
+    - region "Notifications alt+T"
+  - dialog:
+    - heading [level=2]: Создать запрос
+    - generic:
+      - generic:
+        - generic: Пациент
+        - combobox [expanded]:
+          - generic: Выберите пациента...
+          - img
+        - combobox
+      - generic:
+        - generic: Заголовок
+        - textbox:
+          - /placeholder: "Например: Боль в спине"
+      - generic:
+        - generic: Описание
+        - textbox:
+          - /placeholder: Опишите проблему пациента
+      - generic:
+        - generic: Приоритет (1 — низкий, 5 — высокий)
+        - spinbutton: "3"
+      - generic:
+        - generic: Ответственный врач
+        - combobox:
+          - generic: Выберите врача...
+          - img
+        - combobox
+      - button: Сохранить
+  - listbox [ref=e156]:
+    - option "Мария Вишневская" [active] [ref=e157]:
+      - generic [ref=e159]: Мария Вишневская
+    - option "Александр Сидоров" [ref=e160]:
+      - generic [ref=e162]: Александр Сидоров
