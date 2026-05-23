@@ -25,4 +25,8 @@ class UserResponse(UserBase):
     id: int
     is_active: bool
     is_2fa_enabled: bool = False
+    phone: str | None = None
+    avatar_url: str | None = None
+    department: str | None = None
+    specialization: str | None = None
     created_at: datetime

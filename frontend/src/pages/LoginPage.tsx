@@ -1,11 +1,26 @@
 import { Eye, EyeOff, Shield } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMe, login } from '@/api/auth'
+import { getMe, googleLogin, login } from '@/api/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/errorMessage'
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+
+declare global {
+  interface Window {
+    google?: {
+      accounts: {
+        id: {
+          initialize: (config: { client_id: string; callback: (response: { credential: string }) => void }) => void
+          renderButton: (element: HTMLElement, options: Record<string, unknown>) => void
+        }
+      }
+    }
+  }
+}
 
 export const LoginPage = () => {
   const navigate = useNavigate()
@@ -17,10 +32,41 @@ export const LoginPage = () => {
   const [error, setError] = useState('')
   const [requires2fa, setRequires2fa] = useState(false)
   const [totpCode, setTotpCode] = useState('')
+  const googleBtnRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (accessToken) navigate('/dashboard')
   }, [accessToken, navigate])
+
+  useEffect(() => {
+    if (!GOOGLE_CLIENT_ID || !window.google?.accounts?.id || !googleBtnRef.current) return
+
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: async (response) => {
+        try {
+          const result = await googleLogin(response.credential)
+          if (result.access_token && result.refresh_token) {
+            setTokens(result.access_token, result.refresh_token)
+            const user = await getMe()
+            setUser(user)
+            navigate('/dashboard')
+          }
+        } catch (err) {
+          setError(getApiErrorMessage(err))
+        }
+      },
+    })
+
+    window.google.accounts.id.renderButton(googleBtnRef.current, {
+      theme: 'outline',
+      size: 'large',
+      width: '100%',
+      text: 'continue_with',
+      shape: 'pill',
+      locale: 'ru',
+    })
+  }, [navigate, setTokens, setUser])
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -123,6 +169,20 @@ export const LoginPage = () => {
           <Button className='w-full' type='submit' disabled={isSubmitting}>
             {isSubmitting ? 'Вход...' : requires2fa ? 'Подтвердить' : 'Войти'}
           </Button>
+
+          {!requires2fa && GOOGLE_CLIENT_ID && (
+            <>
+              <div className='relative my-2'>
+                <div className='absolute inset-0 flex items-center'>
+                  <div className='w-full border-t border-slate-200' />
+                </div>
+                <div className='relative flex justify-center text-xs'>
+                  <span className='bg-white px-2 text-muted'>или</span>
+                </div>
+              </div>
+              <div ref={googleBtnRef} className='flex justify-center' />
+            </>
+          )}
 
           <p className='text-center text-xs text-muted'>MedQuest · учебный контур</p>
         </form>

@@ -10,6 +10,7 @@ class Settings(BaseModel):
     access_token_expire_minutes: int = 60
     refresh_token_expire_minutes: int = 60 * 24 * 7
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    google_client_id: str = os.getenv("GOOGLE_CLIENT_ID", "")
 
 
 settings = Settings()

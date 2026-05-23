@@ -7,6 +7,10 @@ class LoginRequest(BaseModel):
     totp_code: str | None = None
 
 
+class GoogleLoginRequest(BaseModel):
+    credential: str
+
+
 class RefreshRequest(BaseModel):
     refresh_token: str
 

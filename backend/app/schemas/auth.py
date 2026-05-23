@@ -4,7 +4,11 @@ from pydantic import BaseModel, Field
 
 
 class UpdateProfileRequest(BaseModel):
-    full_name: str = Field(min_length=2, max_length=255)
+    full_name: str | None = Field(default=None, min_length=2, max_length=255)
+    phone: str | None = Field(default=None, max_length=50)
+    avatar_url: str | None = Field(default=None, max_length=500)
+    department: str | None = Field(default=None, max_length=255)
+    specialization: str | None = Field(default=None, max_length=255)
 
 
 class ChangePasswordRequest(BaseModel):

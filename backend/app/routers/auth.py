@@ -4,8 +4,11 @@ import io
 import pyotp
 import qrcode
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.deps import get_current_user
 from app.core.security import (
     create_access_token,
@@ -25,7 +28,7 @@ from app.schemas.auth import (
     TwoFactorVerifyRequest,
     UpdateProfileRequest,
 )
-from app.schemas.token import LoginRequest, LoginResponse, RefreshRequest, TokenPair
+from app.schemas.token import GoogleLoginRequest, LoginRequest, LoginResponse, RefreshRequest, TokenPair
 from app.schemas.user import UserResponse
 from app.services.audit_service import create_audit_log
 
@@ -119,6 +122,56 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
     )
 
 
+@router.post("/google-login", response_model=LoginResponse)
+def google_login(payload: GoogleLoginRequest, request: Request, db: Session = Depends(get_db)):
+    ip_address = request.client.host if request.client else None
+    user_agent = request.headers.get("user-agent")
+
+    if not settings.google_client_id:
+        raise HTTPException(status_code=500, detail="Google OAuth не настроен")
+
+    try:
+        idinfo = id_token.verify_oauth2_token(
+            payload.credential, google_requests.Request(), settings.google_client_id
+        )
+        email = idinfo.get("email")
+        name = idinfo.get("name", email.split("@")[0] if email else "Google User")
+        if not email:
+            raise ValueError("Email not found in token")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Неверный Google токен")
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = User(
+            email=email,
+            full_name=name,
+            hashed_password=get_password_hash("google-oauth-no-password"),
+            role="registrar",
+            is_active=True,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    if not user.is_active:
+        _record_login_event(db, user_id=user.id, ip_address=ip_address, user_agent=user_agent, success=False)
+        raise HTTPException(status_code=401, detail="User inactive")
+
+    _record_login_event(db, user_id=user.id, ip_address=ip_address, user_agent=user_agent, success=True)
+    create_audit_log(
+        db, user_id=user.id, user_full_name=user.full_name,
+        action="LOGIN", entity_type="User", entity_id=user.id,
+        ip_address=ip_address, details={"method": "google"},
+    )
+
+    subject = str(user.id)
+    return LoginResponse(
+        access_token=create_access_token(subject),
+        refresh_token=create_refresh_token(subject),
+    )
+
+
 @router.post("/refresh", response_model=TokenPair)
 def refresh_tokens(payload: RefreshRequest):
     if payload.refresh_token in REVOKED_REFRESH_TOKENS:
@@ -154,7 +207,16 @@ def update_me(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    current_user.full_name = payload.full_name
+    if payload.full_name is not None:
+        current_user.full_name = payload.full_name
+    if payload.phone is not None:
+        current_user.phone = payload.phone
+    if payload.avatar_url is not None:
+        current_user.avatar_url = payload.avatar_url
+    if payload.department is not None:
+        current_user.department = payload.department
+    if payload.specialization is not None:
+        current_user.specialization = payload.specialization
     db.commit()
     db.refresh(current_user)
 

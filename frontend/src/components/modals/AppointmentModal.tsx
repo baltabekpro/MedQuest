@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Video } from 'lucide-react'
 import { useCreateAppointment, useUpdateAppointment, useDeleteAppointment } from '@/hooks/useSchedule'
 import { useUsers } from '@/hooks/useUsers'
 import { usePatients } from '@/hooks/usePatients'
@@ -14,9 +15,10 @@ interface Props {
   onClose: () => void
   appointment?: Appointment | null
   defaultDate?: string
+  onStartVideoCall?: (roomId: string) => void
 }
 
-export const AppointmentModal = ({ open, onClose, appointment, defaultDate }: Props) => {
+export const AppointmentModal = ({ open, onClose, appointment, defaultDate, onStartVideoCall }: Props) => {
   const createMut = useCreateAppointment()
   const updateMut = useUpdateAppointment()
   const deleteMut = useDeleteAppointment()
@@ -156,9 +158,16 @@ export const AppointmentModal = ({ open, onClose, appointment, defaultDate }: Pr
         </div>
         <div className="mt-4 flex justify-between">
           {appointment && (
-            <Button variant="outline" onClick={handleDelete} className="text-red-600 hover:text-red-700">
-              Удалить
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleDelete} className="text-red-600 hover:text-red-700">
+                Удалить
+              </Button>
+              {appointment.room_id && onStartVideoCall && (
+                <Button variant="outline" onClick={() => onStartVideoCall(appointment.room_id!)} className="text-green-600 hover:text-green-700">
+                  <Video className="h-4 w-4" />Видеозвонок
+                </Button>
+              )}
+            </div>
           )}
           <div className="ml-auto flex gap-2">
             <Button variant="outline" onClick={onClose}>Отмена</Button>

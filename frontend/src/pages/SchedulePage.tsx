@@ -102,6 +102,7 @@ export const SchedulePage = () => {
         onClose={() => setModalOpen(false)}
         appointment={editing}
         defaultDate={defaultDate}
+        onStartVideoCall={(roomId) => { setModalOpen(false); setVideoRoom(roomId) }}
       />
     </div>
   )
