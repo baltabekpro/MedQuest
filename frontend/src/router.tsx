@@ -2,6 +2,8 @@
 import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { AuditPage } from '@/pages/AuditPage'
+import { ChatPage } from '@/pages/ChatPage'
+import { ClassifierPage } from '@/pages/ClassifierPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { LoginPage } from '@/pages/LoginPage'
 import { PatientProfilePage } from '@/pages/PatientProfilePage'
@@ -9,6 +11,7 @@ import { PatientsPage } from '@/pages/PatientsPage'
 import { ProfilePage } from '@/pages/ProfilePage'
 import { RequestDetailPage } from '@/pages/RequestDetailPage'
 import { RequestsPage } from '@/pages/RequestsPage'
+import { SchedulePage } from '@/pages/SchedulePage'
 import { UsersPage } from '@/pages/UsersPage'
 import { useAuthStore } from '@/store/authStore'
 
@@ -32,6 +35,9 @@ export const router = createBrowserRouter([
         children: [
           { path: '/', element: <Navigate to='/dashboard' /> },
           { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/classifier', element: <ClassifierPage /> },
+          { path: '/chat', element: <ChatPage /> },
+          { path: '/schedule', element: <SchedulePage /> },
           { path: '/patients', element: <PatientsPage /> },
           { path: '/patients/:id', element: <PatientProfilePage /> },
           { path: '/requests', element: <RequestsPage /> },

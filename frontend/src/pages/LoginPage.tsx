@@ -1,4 +1,4 @@
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Shield } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getMe, login } from '@/api/auth'
@@ -15,6 +15,8 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [requires2fa, setRequires2fa] = useState(false)
+  const [totpCode, setTotpCode] = useState('')
 
   useEffect(() => {
     if (accessToken) navigate('/dashboard')
@@ -25,11 +27,17 @@ export const LoginPage = () => {
     setError('')
     setIsSubmitting(true)
     try {
-      const tokens = await login(email, password)
-      setTokens(tokens.access_token, tokens.refresh_token)
-      const user = await getMe()
-      setUser(user)
-      navigate('/dashboard')
+      const result = await login(email, password, requires2fa ? totpCode : undefined)
+      if (result.requires_2fa) {
+        setRequires2fa(true)
+        return
+      }
+      if (result.access_token && result.refresh_token) {
+        setTokens(result.access_token, result.refresh_token)
+        const user = await getMe()
+        setUser(user)
+        navigate('/dashboard')
+      }
     } catch (err) {
       setError(getApiErrorMessage(err))
     } finally {
@@ -72,21 +80,48 @@ export const LoginPage = () => {
 
           {error && <div className='rounded-md bg-red-100 p-3 text-sm text-red-700'>{error}</div>}
 
-          <div className='space-y-2'>
-            <label className='text-sm font-medium text-slate-700'>Email</label>
-            <Input type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='example@medquest.kz' required />
-          </div>
+          {!requires2fa ? (
+            <>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium text-slate-700'>Email</label>
+                <Input type='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='example@medquest.kz' required />
+              </div>
 
-          <div className='relative'>
-            <label className='mb-2 block text-sm font-medium text-slate-700'>Пароль</label>
-            <Input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Введите пароль' required />
-            <button type='button' aria-label='Показать/скрыть пароль' className='absolute right-3 top-3 text-muted' onClick={() => setShowPassword((v) => !v)}>
-              {showPassword ? <EyeOff className='h-4 w-4' /> : <Eye className='h-4 w-4' />}
-            </button>
-          </div>
+              <div className='relative'>
+                <label className='mb-2 block text-sm font-medium text-slate-700'>Пароль</label>
+                <Input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Введите пароль' required />
+                <button type='button' aria-label='Показать/скрыть пароль' className='absolute right-3 top-3 text-muted' onClick={() => setShowPassword((v) => !v)}>
+                  {showPassword ? <EyeOff className='h-4 w-4' /> : <Eye className='h-4 w-4' />}
+                </button>
+              </div>
+            </>
+          ) : (
+            <div className='space-y-3'>
+              <div className='flex items-center gap-2 text-blue-600'>
+                <Shield className='h-5 w-5' />
+                <span className='text-sm font-medium'>Требуется код двухфакторной аутентификации</span>
+              </div>
+              <label className='text-sm font-medium text-slate-700'>Код из приложения</label>
+              <Input
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder='000000'
+                maxLength={6}
+                className='text-center text-xl tracking-[0.3em]'
+                autoFocus
+              />
+              <button
+                type='button'
+                className='text-xs text-muted hover:text-primary'
+                onClick={() => { setRequires2fa(false); setTotpCode(''); setError('') }}
+              >
+                Назад к входу
+              </button>
+            </div>
+          )}
 
           <Button className='w-full' type='submit' disabled={isSubmitting}>
-            {isSubmitting ? 'Вход...' : 'Войти'}
+            {isSubmitting ? 'Вход...' : requires2fa ? 'Подтвердить' : 'Войти'}
           </Button>
 
           <p className='text-center text-xs text-muted'>MedQuest · учебный контур</p>

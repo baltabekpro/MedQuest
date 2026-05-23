@@ -1,4 +1,4 @@
-import { ClipboardList, FileText, LayoutDashboard, LogOut, User, UserCog, Users } from 'lucide-react'
+import { Brain, Calendar, ClipboardList, FileText, LayoutDashboard, LogOut, MessageSquare, User, UserCog, Users } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { roleLabel } from '@/utils/roleLabel'
@@ -6,8 +6,11 @@ import { cn } from '@/lib/utils'
 
 const links = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/classifier', label: 'AI-Маршрутизатор', icon: Brain },
   { to: '/patients', label: 'Пациенты', icon: Users },
   { to: '/requests', label: 'Запросы', icon: FileText },
+  { to: '/chat', label: 'Чат', icon: MessageSquare },
+  { to: '/schedule', label: 'Расписание', icon: Calendar },
   { to: '/profile', label: 'Мой профиль', icon: User },
   { to: '/users', label: 'Пользователи', icon: UserCog, adminOnly: true },
   { to: '/audit', label: 'Аудит', icon: ClipboardList, adminOnly: true },

@@ -9,6 +9,11 @@ class PatientBase(BaseModel):
     phone: str
     email: EmailStr | None = None
     address: str | None = None
+    iin: str | None = None
+    gender: str | None = None
+    blood_type: str | None = None
+    allergies: str | None = None
+    notes: str | None = None
 
     @field_validator("email", mode="before")
     @classmethod
@@ -28,6 +33,11 @@ class PatientUpdate(BaseModel):
     phone: str | None = None
     email: EmailStr | None = None
     address: str | None = None
+    iin: str | None = None
+    gender: str | None = None
+    blood_type: str | None = None
+    allergies: str | None = None
+    notes: str | None = None
 
     @field_validator("email", mode="before")
     @classmethod

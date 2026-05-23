@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { DatePicker } from '@/components/ui/date-picker'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
 
 const patientSchema = z.object({
@@ -17,6 +18,11 @@ const patientSchema = z.object({
   phone: z.string().regex(/^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/, 'Формат +7 (xxx) xxx-xx-xx'),
   email: z.string().email('Некорректный email').or(z.literal('')),
   address: z.string().optional(),
+  iin: z.string().optional(),
+  gender: z.string().optional(),
+  blood_type: z.string().optional(),
+  allergies: z.string().optional(),
+  notes: z.string().optional(),
 })
 
 const formatPhone = (value: string): string => {
@@ -62,6 +68,11 @@ export const PatientModal = ({ open, onOpenChange, patient }: PatientModalProps)
       phone: patient?.phone ?? '',
       email: patient?.email ?? '',
       address: patient?.address ?? '',
+      iin: patient?.iin ?? '',
+      gender: patient?.gender ?? '',
+      blood_type: patient?.blood_type ?? '',
+      allergies: patient?.allergies ?? '',
+      notes: patient?.notes ?? '',
     },
   })
 
@@ -71,6 +82,11 @@ export const PatientModal = ({ open, onOpenChange, patient }: PatientModalProps)
         ...values,
         email: values.email ? values.email : null,
         address: values.address && values.address.trim() ? values.address : null,
+        iin: values.iin?.trim() || null,
+        gender: values.gender || null,
+        blood_type: values.blood_type || null,
+        allergies: values.allergies?.trim() || null,
+        notes: values.notes?.trim() || null,
       }
       if (patient) {
         await updateMutation.mutateAsync({ id: patient.id, payload })
@@ -87,7 +103,7 @@ export const PatientModal = ({ open, onOpenChange, patient }: PatientModalProps)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-h-[90vh] overflow-y-auto">
         <DialogTitle>{patient ? 'Редактировать пациента' : 'Добавить пациента'}</DialogTitle>
         <form className='mt-4 space-y-3' onSubmit={onSubmit}>
           <div className='flex flex-col gap-1'>
@@ -96,6 +112,33 @@ export const PatientModal = ({ open, onOpenChange, patient }: PatientModalProps)
             {form.formState.errors.full_name?.message ? (
               <div className='text-xs text-red-600'>{form.formState.errors.full_name.message.toString()}</div>
             ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>ИИН (необязательно)</label>
+            <Input placeholder='123456789012' maxLength={12} {...form.register('iin')} />
+          </div>
+          <div className='grid grid-cols-2 gap-2'>
+            <div className='flex flex-col gap-1'>
+              <label className='text-xs font-medium text-muted-foreground'>Пол</label>
+              <Select value={form.watch('gender') || undefined} onValueChange={(val) => form.setValue('gender', val)}>
+                <SelectTrigger><SelectValue placeholder="Выберите" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Мужской</SelectItem>
+                  <SelectItem value="female">Женский</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className='flex flex-col gap-1'>
+              <label className='text-xs font-medium text-muted-foreground'>Группа крови</label>
+              <Select value={form.watch('blood_type') || undefined} onValueChange={(val) => form.setValue('blood_type', val)}>
+                <SelectTrigger><SelectValue placeholder="Выберите" /></SelectTrigger>
+                <SelectContent>
+                  {['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'].map((bt) => (
+                    <SelectItem key={bt} value={bt}>{bt}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           <div className='flex flex-col gap-1'>
             <label className='text-xs font-medium text-muted-foreground'>Дата рождения</label>
@@ -132,9 +175,14 @@ export const PatientModal = ({ open, onOpenChange, patient }: PatientModalProps)
           <div className='flex flex-col gap-1'>
             <label className='text-xs font-medium text-muted-foreground'>Адрес (необязательно)</label>
             <Input placeholder='г. Алматы, ул. Абая 1' {...form.register('address')} />
-            {form.formState.errors.address?.message ? (
-              <div className='text-xs text-red-600'>{form.formState.errors.address.message.toString()}</div>
-            ) : null}
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Аллергии (необязательно)</label>
+            <Input placeholder='Пенициллин, аспирин...' {...form.register('allergies')} />
+          </div>
+          <div className='flex flex-col gap-1'>
+            <label className='text-xs font-medium text-muted-foreground'>Заметки (необязательно)</label>
+            <Input placeholder='Дополнительные сведения...' {...form.register('notes')} />
           </div>
           <Button type='submit' className='w-full'>
             Сохранить

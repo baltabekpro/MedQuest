@@ -7,6 +7,11 @@ export interface UserResponse {
   full_name: string
   role: Role
   is_active: boolean
+  is_2fa_enabled?: boolean
+  phone?: string | null
+  avatar_url?: string | null
+  department?: string | null
+  specialization?: string | null
   created_at: string
 }
 
@@ -17,6 +22,11 @@ export interface PatientResponse {
   phone: string
   email: string | null
   address: string | null
+  iin: string | null
+  gender: string | null
+  blood_type: string | null
+  allergies: string | null
+  notes: string | null
   created_at: string
   created_by_id: number
   created_by_full_name?: string

@@ -24,4 +24,5 @@ class UserResponse(UserBase):
 
     id: int
     is_active: bool
+    is_2fa_enabled: bool = False
     created_at: datetime

@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { changePassword, getSessions, updateMe } from '@/api/auth'
+import { changePassword, getMe, getSessions, updateMe } from '@/api/auth'
 import { useAuthStore } from '@/store/authStore'
+import { TwoFactorSetup } from '@/components/TwoFactorSetup'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -72,6 +73,13 @@ export const ProfilePage = () => {
           <Button onClick={async () => { await changePassword(oldPassword, newPassword); toast.success('Пароль изменен') }}>Изменить пароль</Button>
         </div>
       </Card>
+      <TwoFactorSetup
+        isEnabled={user?.is_2fa_enabled ?? false}
+        onStatusChange={async () => {
+          const updated = await getMe()
+          setUser(updated)
+        }}
+      />
       <Card>
         <div className='mb-3 flex items-center justify-between gap-2'>
           <h2 className='text-lg font-semibold'>Активность</h2>

@@ -1,3 +1,8 @@
+import base64
+import io
+
+import pyotp
+import qrcode
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.orm import Session
 
@@ -12,8 +17,15 @@ from app.core.security import (
 from app.database import get_db
 from app.models.login_event import LoginEvent
 from app.models.user import User
-from app.schemas.auth import ChangePasswordRequest, LoginEventResponse, MessageResponse, UpdateProfileRequest
-from app.schemas.token import LoginRequest, RefreshRequest, TokenPair
+from app.schemas.auth import (
+    ChangePasswordRequest,
+    LoginEventResponse,
+    MessageResponse,
+    TwoFactorSetupResponse,
+    TwoFactorVerifyRequest,
+    UpdateProfileRequest,
+)
+from app.schemas.token import LoginRequest, LoginResponse, RefreshRequest, TokenPair
 from app.schemas.user import UserResponse
 from app.services.audit_service import create_audit_log
 
@@ -39,7 +51,7 @@ def _record_login_event(
     db.commit()
 
 
-@router.post("/login", response_model=TokenPair)
+@router.post("/login", response_model=LoginResponse)
 def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)):
     ip_address = request.client.host if request.client else None
     user_agent = request.headers.get("user-agent")
@@ -71,6 +83,17 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
             detail="User inactive",
         )
 
+    # 2FA check
+    if user.is_2fa_enabled:
+        if not payload.totp_code:
+            return LoginResponse(requires_2fa=True)
+        totp = pyotp.TOTP(user.totp_secret)
+        if not totp.verify(payload.totp_code, valid_window=1):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Неверный код 2FA",
+            )
+
     _record_login_event(
         db,
         user_id=user.id,
@@ -90,7 +113,7 @@ def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)
     )
 
     subject = str(user.id)
-    return TokenPair(
+    return LoginResponse(
         access_token=create_access_token(subject),
         refresh_token=create_refresh_token(subject),
     )
@@ -172,6 +195,116 @@ def change_password(
         details={"password_changed": True},
     )
     return MessageResponse(message="Пароль успешно изменён")
+
+
+@router.post("/2fa/enable", response_model=TwoFactorSetupResponse)
+def enable_2fa(
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.is_2fa_enabled:
+        raise HTTPException(status_code=400, detail="2FA уже включена")
+
+    secret = pyotp.random_base32()
+    totp = pyotp.TOTP(secret)
+    provisioning_uri = totp.provisioning_uri(
+        name=current_user.email,
+        issuer_name="MedQuest CRM",
+    )
+
+    # Generate QR code as base64 PNG
+    qr = qrcode.QRCode(version=1, box_size=10, border=4)
+    qr.add_data(provisioning_uri)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    buffer = io.BytesIO()
+    img.save(buffer, format="PNG")
+    qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+
+    # Temporarily store the secret (not yet enabled)
+    current_user.totp_secret = secret
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"2fa_enable_initiated": True},
+    )
+
+    return TwoFactorSetupResponse(
+        secret=secret,
+        qr_code_base64=qr_base64,
+        provisioning_uri=provisioning_uri,
+    )
+
+
+@router.post("/2fa/verify", response_model=MessageResponse)
+def verify_2fa(
+    payload: TwoFactorVerifyRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not current_user.totp_secret:
+        raise HTTPException(status_code=400, detail="Сначала инициализируйте 2FA через /auth/2fa/enable")
+
+    totp = pyotp.TOTP(current_user.totp_secret)
+    if not totp.verify(payload.code, valid_window=1):
+        raise HTTPException(status_code=400, detail="Неверный код")
+
+    current_user.is_2fa_enabled = True
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"2fa_enabled": True},
+    )
+
+    return MessageResponse(message="2FA успешно активирована")
+
+
+@router.post("/2fa/disable", response_model=MessageResponse)
+def disable_2fa(
+    payload: TwoFactorVerifyRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not current_user.is_2fa_enabled:
+        raise HTTPException(status_code=400, detail="2FA не включена")
+
+    totp = pyotp.TOTP(current_user.totp_secret)
+    if not totp.verify(payload.code, valid_window=1):
+        raise HTTPException(status_code=400, detail="Неверный код")
+
+    current_user.is_2fa_enabled = False
+    current_user.totp_secret = None
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"2fa_disabled": True},
+    )
+
+    return MessageResponse(message="2FA отключена")
 
 
 @router.get("/sessions", response_model=list[LoginEventResponse])

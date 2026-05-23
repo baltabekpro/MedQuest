@@ -32,10 +32,15 @@ export const PatientProfilePage = () => {
           </div>
           <div className='space-y-2 text-sm'>
             <p><b>ФИО:</b> {patientQuery.data.full_name}</p>
+            <p><b>ИИН:</b> {patientQuery.data.iin ?? '—'}</p>
+            <p><b>Пол:</b> {patientQuery.data.gender === 'male' ? 'Мужской' : patientQuery.data.gender === 'female' ? 'Женский' : '—'}</p>
+            <p><b>Группа крови:</b> {patientQuery.data.blood_type ?? '—'}</p>
             <p><b>Дата рождения:</b> {patientQuery.data.birth_date}</p>
             <p><b>Телефон:</b> {patientQuery.data.phone}</p>
             <p><b>Email:</b> {patientQuery.data.email ?? '—'}</p>
             <p><b>Адрес:</b> {patientQuery.data.address ?? '—'}</p>
+            <p><b>Аллергии:</b> {patientQuery.data.allergies ?? '—'}</p>
+            <p><b>Заметки:</b> {patientQuery.data.notes ?? '—'}</p>
           </div>
         </Card>
         <Card>

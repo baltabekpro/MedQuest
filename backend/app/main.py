@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.core.security import get_password_hash
 from app.database import SessionLocal
 from app.models import User
-from app.routers import audit, auth, dashboard, notifications, patients, requests, users
+from app.routers import audit, auth, chat, classifier, dashboard, notifications, patients, requests, schedule, users
 
 
 @asynccontextmanager
@@ -55,6 +55,9 @@ app.include_router(requests.router)
 app.include_router(dashboard.router)
 app.include_router(audit.router)
 app.include_router(notifications.router)
+app.include_router(classifier.router)
+app.include_router(chat.router)
+app.include_router(schedule.router)
 
 
 def seed_admin_user() -> None:

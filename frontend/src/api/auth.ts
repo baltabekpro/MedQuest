@@ -1,8 +1,15 @@
 import api from '@/api/client'
 import type { TokenPair, UserResponse } from '@/types/api'
 
-export const login = async (email: string, password: string) => {
-  const { data } = await api.post<TokenPair>('/auth/login', { email, password })
+export interface LoginResponse {
+  access_token: string | null
+  refresh_token: string | null
+  token_type: string
+  requires_2fa: boolean
+}
+
+export const login = async (email: string, password: string, totp_code?: string) => {
+  const { data } = await api.post<LoginResponse>('/auth/login', { email, password, totp_code })
   return data
 }
 

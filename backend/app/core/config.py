@@ -9,6 +9,7 @@ class Settings(BaseModel):
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
     refresh_token_expire_minutes: int = 60 * 24 * 7
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
 
 
 settings = Settings()

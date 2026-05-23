@@ -16,6 +16,16 @@ class MessageResponse(BaseModel):
     message: str
 
 
+class TwoFactorSetupResponse(BaseModel):
+    secret: str
+    qr_code_base64: str
+    provisioning_uri: str
+
+
+class TwoFactorVerifyRequest(BaseModel):
+    code: str = Field(min_length=6, max_length=6)
+
+
 class LoginEventResponse(BaseModel):
     id: int
     user_id: int | None
