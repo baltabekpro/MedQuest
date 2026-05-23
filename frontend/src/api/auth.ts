@@ -23,8 +23,8 @@ export const getMe = async () => {
   return data
 }
 
-export const changePassword = async (old_password: string, new_password: string) => {
-  await api.post('/auth/change-password', { old_password, new_password })
+export const changePassword = async (current_password: string, new_password: string) => {
+  await api.post('/auth/change-password', { current_password, new_password })
 }
 
 export const updateMe = async (payload: { full_name?: string; phone?: string; avatar_url?: string; department?: string; specialization?: string }) => {
