@@ -4,7 +4,7 @@
 set -euo pipefail
 
 APP_DIR="/opt/medquest"
-REPO_URL="https://github.com/YOUR_ORG/MedQuest.git"   # <-- replace with actual repo URL
+REPO_URL="https://github.com/studenthubkz/MedQuest.git"
 BACKEND_DIR="$APP_DIR/backend"
 VENV="$BACKEND_DIR/venv"
 
