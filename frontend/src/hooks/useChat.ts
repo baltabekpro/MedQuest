@@ -3,7 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { getContacts, getMessages, type ChatMessage, type ChatContact } from '@/api/chat'
 import { useAuthStore } from '@/store/authStore'
 
-const WS_BASE = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace(/^http/, 'ws')
+const WS_BASE = (import.meta.env.VITE_API_URL || 'https://172-207-57-215.sslip.io/medquest').replace(/^http/, 'ws')
 
 export function useChat() {
   const queryClient = useQueryClient()
