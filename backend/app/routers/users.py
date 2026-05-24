@@ -1,4 +1,8 @@
+import secrets
+import string
+
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from pydantic import BaseModel
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -9,6 +13,10 @@ from app.models.user import User
 from app.schemas.common import PaginatedResponse
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 from app.services.audit_service import create_audit_log
+
+
+class GeneratedPasswordResponse(BaseModel):
+    password: str
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -146,3 +154,34 @@ def delete_user(
     )
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post("/{user_id}/generate-password", response_model=GeneratedPasswordResponse)
+def generate_password(
+    user_id: int,
+    request: Request,
+    current_user: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    alphabet = string.ascii_letters + string.digits + "!@#$%&*"
+    password = ''.join(secrets.choice(alphabet) for _ in range(16))
+    user.hashed_password = get_password_hash(password)
+    user.is_google_user = False
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=user.id,
+        ip_address=request.client.host if request and request.client else None,
+        details={"password_generated": True},
+    )
+
+    return GeneratedPasswordResponse(password=password)

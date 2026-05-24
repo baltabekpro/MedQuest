@@ -1,11 +1,16 @@
 import api from '@/api/client'
 import type { TokenPair, UserResponse } from '@/types/api'
 
+// re-export TokenPair for selectRole
+export type { TokenPair }
+
 export interface LoginResponse {
   access_token: string | null
   refresh_token: string | null
   token_type: string
   requires_2fa: boolean
+  requires_role_selection: boolean
+  temp_token: string | null
 }
 
 export const login = async (email: string, password: string, totp_code?: string) => {
@@ -42,4 +47,9 @@ export const getSessions = async () => {
     user_agent: string | null
     success: boolean
   }>
+}
+
+export const selectRole = async (temp_token: string, role: string) => {
+  const { data } = await api.post<TokenPair>('/auth/select-role', { temp_token, role })
+  return data
 }

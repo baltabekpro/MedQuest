@@ -1,8 +1,9 @@
 import { Eye, EyeOff, Shield } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMe, googleLogin, login } from '@/api/auth'
+import { getMe, googleLogin, login, selectRole } from '@/api/auth'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/errorMessage'
@@ -22,6 +23,13 @@ declare global {
   }
 }
 
+const roleOptions = [
+  { value: 'admin', label: 'Администратор', desc: 'Полный доступ к системе' },
+  { value: 'doctor', label: 'Врач', desc: 'Приёмы, пациенты, расписание' },
+  { value: 'nurse', label: 'Медсестра', desc: 'Помощь врачам, расписание' },
+  { value: 'registrar', label: 'Регистратор', desc: 'Регистрация пациентов, заявки' },
+]
+
 export const LoginPage = () => {
   const navigate = useNavigate()
   const { accessToken, setTokens, setUser } = useAuthStore()
@@ -32,30 +40,50 @@ export const LoginPage = () => {
   const [error, setError] = useState('')
   const [requires2fa, setRequires2fa] = useState(false)
   const [totpCode, setTotpCode] = useState('')
+  const [roleSelectOpen, setRoleSelectOpen] = useState(false)
+  const [tempToken, setTempToken] = useState('')
+  const [selectedRole, setSelectedRole] = useState('')
+  const [roleSubmitting, setRoleSubmitting] = useState(false)
   const googleBtnRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (accessToken) navigate('/dashboard')
   }, [accessToken, navigate])
 
+  const finishLogin = async (access: string, refresh: string) => {
+    setTokens(access, refresh)
+    const user = await getMe()
+    setUser(user)
+    navigate('/dashboard')
+  }
+
+  const handleGoogleCallback = async (credential: string) => {
+    try {
+      const result = await googleLogin(credential)
+      if (result.requires_role_selection && result.temp_token) {
+        setTempToken(result.temp_token)
+        setRoleSelectOpen(true)
+        return
+      }
+      if (result.requires_2fa) {
+        // Google user with 2FA — can't use TOTP here, show message
+        setError('Для этого аккаунта включена 2FA. Войдите через email/пароль.')
+        return
+      }
+      if (result.access_token && result.refresh_token) {
+        await finishLogin(result.access_token, result.refresh_token)
+      }
+    } catch (err) {
+      setError(getApiErrorMessage(err))
+    }
+  }
+
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || !window.google?.accounts?.id || !googleBtnRef.current) return
 
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: async (response) => {
-        try {
-          const result = await googleLogin(response.credential)
-          if (result.access_token && result.refresh_token) {
-            setTokens(result.access_token, result.refresh_token)
-            const user = await getMe()
-            setUser(user)
-            navigate('/dashboard')
-          }
-        } catch (err) {
-          setError(getApiErrorMessage(err))
-        }
-      },
+      callback: (response) => handleGoogleCallback(response.credential),
     })
 
     window.google.accounts.id.renderButton(googleBtnRef.current, {
@@ -66,7 +94,22 @@ export const LoginPage = () => {
       shape: 'pill',
       locale: 'ru',
     })
-  }, [navigate, setTokens, setUser])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const handleRoleSelect = async () => {
+    if (!selectedRole) return
+    setRoleSubmitting(true)
+    try {
+      const tokens = await selectRole(tempToken, selectedRole)
+      await finishLogin(tokens.access_token, tokens.refresh_token)
+    } catch (err) {
+      setError(getApiErrorMessage(err))
+      setRoleSelectOpen(false)
+    } finally {
+      setRoleSubmitting(false)
+    }
+  }
 
   const submit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -79,10 +122,7 @@ export const LoginPage = () => {
         return
       }
       if (result.access_token && result.refresh_token) {
-        setTokens(result.access_token, result.refresh_token)
-        const user = await getMe()
-        setUser(user)
-        navigate('/dashboard')
+        await finishLogin(result.access_token, result.refresh_token)
       }
     } catch (err) {
       setError(getApiErrorMessage(err))
@@ -187,6 +227,38 @@ export const LoginPage = () => {
           <p className='text-center text-xs text-muted'>MedQuest · учебный контур</p>
         </form>
       </section>
+
+      {/* Role selection modal for new Google users */}
+      <Dialog open={roleSelectOpen} onOpenChange={() => {}}>
+        <DialogContent className="max-w-md">
+          <DialogTitle>Выберите вашу роль</DialogTitle>
+          <p className="text-sm text-muted mt-1">Выберите роль, которая соответствует вашим обязанностям</p>
+          <div className="mt-4 space-y-2">
+            {roleOptions.map((r) => (
+              <button
+                key={r.value}
+                type="button"
+                onClick={() => setSelectedRole(r.value)}
+                className={`w-full rounded-xl border-2 p-4 text-left transition ${
+                  selectedRole === r.value
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                }`}
+              >
+                <span className="font-medium text-slate-900">{r.label}</span>
+                <p className="mt-0.5 text-xs text-muted">{r.desc}</p>
+              </button>
+            ))}
+          </div>
+          <Button
+            className="w-full mt-4"
+            disabled={!selectedRole || roleSubmitting}
+            onClick={handleRoleSelect}
+          >
+            {roleSubmitting ? 'Применение...' : 'Продолжить'}
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

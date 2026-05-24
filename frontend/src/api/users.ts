@@ -28,3 +28,8 @@ export const updateUser = async (id: number, payload: Partial<UserResponse>) => 
 export const deleteUser = async (id: number) => {
   await api.delete(`/users/${id}`)
 }
+
+export const generatePassword = async (id: number) => {
+  const { data } = await api.post<{ password: string }>(`/users/${id}/generate-password`)
+  return data
+}

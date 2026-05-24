@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
-import { User, Phone, Building, Stethoscope, Camera } from 'lucide-react'
+import { User, Phone, Building, Stethoscope, Camera, Globe } from 'lucide-react'
 
 const passwordStrength = (value: string) => {
   if (value.length < 8) return 'Слабый'
@@ -145,12 +145,22 @@ export const ProfilePage = () => {
       {/* Безопасность */}
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Безопасность</h2>
-        <div className="space-y-2">
-          <Input type="password" placeholder="Текущий пароль" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
-          <Input type="password" placeholder="Новый пароль" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-          <p className="text-sm text-muted">Надежность: {passwordStrength(newPassword)}</p>
-          <Button onClick={async () => { await changePassword(oldPassword, newPassword); toast.success('Пароль изменен') }}>Изменить пароль</Button>
-        </div>
+        {user?.is_google_user ? (
+          <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-4">
+            <Globe className="h-5 w-5 text-blue-600 shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-blue-900">Аккаунт создан через Google</p>
+              <p className="text-xs text-blue-700">Пароль не установлен. Обратитесь к администратору для создания пароля.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <Input type="password" placeholder="Текущий пароль" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+            <Input type="password" placeholder="Новый пароль" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            <p className="text-sm text-muted">Надежность: {passwordStrength(newPassword)}</p>
+            <Button onClick={async () => { await changePassword(oldPassword, newPassword); toast.success('Пароль изменен') }}>Изменить пароль</Button>
+          </div>
+        )}
       </Card>
 
       {/* 2FA */}

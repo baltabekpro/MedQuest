@@ -28,7 +28,7 @@ from app.schemas.auth import (
     TwoFactorVerifyRequest,
     UpdateProfileRequest,
 )
-from app.schemas.token import GoogleLoginRequest, LoginRequest, LoginResponse, RefreshRequest, TokenPair
+from app.schemas.token import GoogleLoginRequest, LoginRequest, LoginResponse, RefreshRequest, SelectRoleRequest, TokenPair
 from app.schemas.user import UserResponse
 from app.services.audit_service import create_audit_log
 
@@ -143,20 +143,30 @@ def google_login(payload: GoogleLoginRequest, request: Request, db: Session = De
 
     user = db.query(User).filter(User.email == email).first()
     if not user:
+        # New Google user — create with temporary role and require role selection
         user = User(
             email=email,
             full_name=name,
             hashed_password=get_password_hash("google-oauth-no-password"),
-            role="registrar",
+            role="pending",
             is_active=True,
+            is_google_user=True,
         )
         db.add(user)
         db.commit()
         db.refresh(user)
 
+        temp_token = create_access_token(str(user.id))
+        _record_login_event(db, user_id=user.id, ip_address=ip_address, user_agent=user_agent, success=True)
+        return LoginResponse(requires_role_selection=True, temp_token=temp_token)
+
     if not user.is_active:
         _record_login_event(db, user_id=user.id, ip_address=ip_address, user_agent=user_agent, success=False)
         raise HTTPException(status_code=401, detail="User inactive")
+
+    # 2FA check for existing Google users
+    if user.is_2fa_enabled:
+        return LoginResponse(requires_2fa=True)
 
     _record_login_event(db, user_id=user.id, ip_address=ip_address, user_agent=user_agent, success=True)
     create_audit_log(
@@ -167,6 +177,57 @@ def google_login(payload: GoogleLoginRequest, request: Request, db: Session = De
 
     subject = str(user.id)
     return LoginResponse(
+        access_token=create_access_token(subject),
+        refresh_token=create_refresh_token(subject),
+    )
+
+
+@router.post("/google-login/verify-2fa", response_model=LoginResponse)
+def google_login_verify_2fa(payload: TwoFactorVerifyRequest, request: Request, db: Session = Depends(get_db)):
+    """Second step for Google users with 2FA enabled — verify TOTP and return tokens."""
+    # We need email from the token code to find the user — but we don't have it.
+    # Instead, we'll accept email in the request.
+    raise HTTPException(status_code=501, detail="Not implemented — use regular login for 2FA Google users")
+
+
+@router.post("/select-role", response_model=TokenPair)
+def select_role(payload: SelectRoleRequest, request: Request, db: Session = Depends(get_db)):
+    """New Google user selects their role after first login."""
+    allowed_roles = {"admin", "registrar", "doctor", "nurse"}
+    if payload.role not in allowed_roles:
+        raise HTTPException(status_code=400, detail=f"Недопустимая роль. Допустимые: {', '.join(allowed_roles)}")
+
+    try:
+        token_data = decode_token(payload.temp_token, expected_type="access")
+        user_id = int(token_data["sub"])
+    except Exception:
+        raise HTTPException(status_code=401, detail="Недействительный токен")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    if user.role != "pending":
+        raise HTTPException(status_code=400, detail="Роль уже выбрана")
+
+    user.role = payload.role
+    db.commit()
+
+    _record_login_event(
+        db, user_id=user.id,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+        success=True,
+    )
+    create_audit_log(
+        db, user_id=user.id, user_full_name=user.full_name,
+        action="UPDATE", entity_type="User", entity_id=user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"role_selected": payload.role},
+    )
+
+    subject = str(user.id)
+    return TokenPair(
         access_token=create_access_token(subject),
         refresh_token=create_refresh_token(subject),
     )

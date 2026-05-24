@@ -1,4 +1,4 @@
-export type Role = 'admin' | 'registrar' | 'doctor'
+export type Role = 'admin' | 'registrar' | 'doctor' | 'nurse'
 export type RequestStatus = 'new' | 'in_progress' | 'closed'
 
 export interface UserResponse {
@@ -8,6 +8,7 @@ export interface UserResponse {
   role: Role
   is_active: boolean
   is_2fa_enabled?: boolean
+  is_google_user?: boolean
   phone?: string | null
   avatar_url?: string | null
   department?: string | null

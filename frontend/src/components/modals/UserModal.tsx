@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useUserMutations } from '@/hooks/useUsers'
+import { generatePassword } from '@/api/users'
 import type { UserResponse } from '@/types/api'
 import { getApiErrorMessage } from '@/utils/errorMessage'
 import { Button } from '@/components/ui/button'
@@ -10,12 +11,13 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { Copy, KeyRound } from 'lucide-react'
 
 const createSchema = z
   .object({
     full_name: z.string().min(2, 'Минимум 2 символа'),
     email: z.string().email('Некорректный email'),
-    role: z.enum(['admin', 'registrar', 'doctor']),
+    role: z.enum(['admin', 'registrar', 'doctor', 'nurse']),
     password: z.string().min(6, 'Минимум 6 символов'),
     confirmPassword: z.string().min(6),
     is_active: z.boolean(),
@@ -25,7 +27,7 @@ const createSchema = z
 const editSchema = z.object({
   full_name: z.string().min(2, 'Минимум 2 символа'),
   email: z.string().email('Некорректный email'),
-  role: z.enum(['admin', 'registrar', 'doctor']),
+  role: z.enum(['admin', 'registrar', 'doctor', 'nurse']),
   is_active: z.boolean(),
 })
 
@@ -41,6 +43,8 @@ interface UserModalProps {
 export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
   const isEdit = !!user
   const { createMutation, updateMutation } = useUserMutations()
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null)
+  const [generatingPassword, setGeneratingPassword] = useState(false)
 
   const createForm = useForm<CreateFormData>({
     resolver: zodResolver(createSchema),
@@ -58,15 +62,37 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
       editForm.reset({
         full_name: user.full_name,
         email: user.email,
-        role: user.role as 'admin' | 'registrar' | 'doctor',
+        role: user.role as 'admin' | 'registrar' | 'doctor' | 'nurse',
         is_active: user.is_active,
       })
     }
     if (!open) {
       createForm.reset()
       editForm.reset()
+      setGeneratedPassword(null)
     }
   }, [user, open])
+
+  const handleGeneratePassword = async () => {
+    if (!user) return
+    setGeneratingPassword(true)
+    try {
+      const result = await generatePassword(user.id)
+      setGeneratedPassword(result.password)
+      toast.success('Пароль сгенерирован')
+    } catch (error) {
+      toast.error(getApiErrorMessage(error))
+    } finally {
+      setGeneratingPassword(false)
+    }
+  }
+
+  const handleCopyPassword = () => {
+    if (generatedPassword) {
+      navigator.clipboard.writeText(generatedPassword)
+      toast.success('Пароль скопирован')
+    }
+  }
 
   const submitCreate = createForm.handleSubmit(async (values) => {
     try {
@@ -111,12 +137,13 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
             </div>
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>Роль пользователя</label>
-              <Select value={editForm.watch('role')} onValueChange={(value) => editForm.setValue('role', value as 'admin' | 'registrar' | 'doctor')}>
+              <Select value={editForm.watch('role')} onValueChange={(value) => editForm.setValue('role', value as 'admin' | 'registrar' | 'doctor' | 'nurse')}>
                 <SelectTrigger><SelectValue placeholder='Выберите роль...' /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value='admin'>Администратор</SelectItem>
                   <SelectItem value='registrar'>Регистратор</SelectItem>
                   <SelectItem value='doctor'>Врач</SelectItem>
+                  <SelectItem value='nurse'>Медсестра</SelectItem>
                 </SelectContent>
               </Select>
               {editForm.formState.errors.role?.message ? (
@@ -127,6 +154,24 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
               <input type='checkbox' checked={editForm.watch('is_active')} onChange={(e) => editForm.setValue('is_active', e.target.checked)} />
               Активен
             </label>
+            {user?.is_google_user && (
+              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-2">
+                <p className="text-xs font-medium text-blue-800">Аккаунт Google — пароль не установлен</p>
+                {generatedPassword ? (
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 rounded bg-white px-3 py-2 text-sm font-mono select-all">{generatedPassword}</code>
+                    <Button type="button" variant="outline" size="sm" onClick={handleCopyPassword} className="gap-1 shrink-0">
+                      <Copy className="h-3.5 w-3.5" /> Копировать
+                    </Button>
+                  </div>
+                ) : (
+                  <Button type="button" variant="outline" size="sm" onClick={handleGeneratePassword} disabled={generatingPassword} className="gap-1.5 w-full">
+                    <KeyRound className="h-3.5 w-3.5" />
+                    {generatingPassword ? 'Генерация...' : 'Сгенерировать пароль'}
+                  </Button>
+                )}
+              </div>
+            )}
             <Button type='submit' className='w-full' disabled={updateMutation.isPending}>
               {updateMutation.isPending ? 'Сохранение...' : 'Сохранить'}
             </Button>
@@ -149,12 +194,13 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
             </div>
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>Роль пользователя</label>
-              <Select value={createForm.watch('role')} onValueChange={(value) => createForm.setValue('role', value as 'admin' | 'registrar' | 'doctor')}>
+              <Select value={createForm.watch('role')} onValueChange={(value) => createForm.setValue('role', value as 'admin' | 'registrar' | 'doctor' | 'nurse')}>
                 <SelectTrigger><SelectValue placeholder='Выберите роль...' /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value='admin'>Администратор</SelectItem>
                   <SelectItem value='registrar'>Регистратор</SelectItem>
                   <SelectItem value='doctor'>Врач</SelectItem>
+                  <SelectItem value='nurse'>Медсестра</SelectItem>
                 </SelectContent>
               </Select>
               {createForm.formState.errors.role?.message ? (
