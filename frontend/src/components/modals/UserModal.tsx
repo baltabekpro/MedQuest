@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useUserMutations } from '@/hooks/useUsers'
-import { generatePassword } from '@/api/users'
+import { generatePassword, resetPassword } from '@/api/users'
 import type { UserResponse } from '@/types/api'
 import { getApiErrorMessage } from '@/utils/errorMessage'
 import { Button } from '@/components/ui/button'
@@ -11,7 +11,7 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Copy, KeyRound } from 'lucide-react'
+import { Copy, KeyRound, RotateCcw } from 'lucide-react'
 
 const createSchema = z
   .object({
@@ -21,6 +21,9 @@ const createSchema = z
     password: z.string().min(6, 'Минимум 6 символов'),
     confirmPassword: z.string().min(6),
     is_active: z.boolean(),
+    phone: z.string().optional(),
+    department: z.string().optional(),
+    specialization: z.string().optional(),
   })
   .refine((v) => v.password === v.confirmPassword, { path: ['confirmPassword'], message: 'Пароли не совпадают' })
 
@@ -29,6 +32,9 @@ const editSchema = z.object({
   email: z.string().email('Некорректный email'),
   role: z.enum(['admin', 'registrar', 'doctor', 'nurse']),
   is_active: z.boolean(),
+  phone: z.string().optional(),
+  department: z.string().optional(),
+  specialization: z.string().optional(),
 })
 
 type CreateFormData = z.infer<typeof createSchema>
@@ -45,18 +51,19 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
   const { createMutation, updateMutation } = useUserMutations()
   const [generatedPassword, setGeneratedPassword] = useState<string | null>(null)
   const [generatingPassword, setGeneratingPassword] = useState(false)
+  const [resetNewPassword, setResetNewPassword] = useState('')
+  const [showResetPassword, setShowResetPassword] = useState(false)
 
   const createForm = useForm<CreateFormData>({
     resolver: zodResolver(createSchema),
-    defaultValues: { full_name: '', email: '', role: 'registrar', password: '', confirmPassword: '', is_active: true },
+    defaultValues: { full_name: '', email: '', role: 'registrar', password: '', confirmPassword: '', is_active: true, phone: '', department: '', specialization: '' },
   })
 
   const editForm = useForm<EditFormData>({
     resolver: zodResolver(editSchema),
-    defaultValues: { full_name: '', email: '', role: 'registrar', is_active: true },
+    defaultValues: { full_name: '', email: '', role: 'registrar', is_active: true, phone: '', department: '', specialization: '' },
   })
 
-  // Заполняем форму при открытии редактирования
   useEffect(() => {
     if (user && open) {
       editForm.reset({
@@ -64,12 +71,17 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
         email: user.email,
         role: user.role as 'admin' | 'registrar' | 'doctor' | 'nurse',
         is_active: user.is_active,
+        phone: user.phone || '',
+        department: user.department || '',
+        specialization: user.specialization || '',
       })
     }
     if (!open) {
       createForm.reset()
       editForm.reset()
       setGeneratedPassword(null)
+      setResetNewPassword('')
+      setShowResetPassword(false)
     }
   }, [user, open])
 
@@ -91,6 +103,18 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
     if (generatedPassword) {
       navigator.clipboard.writeText(generatedPassword)
       toast.success('Пароль скопирован')
+    }
+  }
+
+  const handleResetPassword = async () => {
+    if (!user || !resetNewPassword || resetNewPassword.length < 6) return
+    try {
+      await resetPassword(user.id, resetNewPassword)
+      toast.success('Пароль сброшен')
+      setShowResetPassword(false)
+      setResetNewPassword('')
+    } catch (error) {
+      toast.error(getApiErrorMessage(error))
     }
   }
 
@@ -116,7 +140,7 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogTitle>{isEdit ? 'Редактировать пользователя' : 'Добавить пользователя'}</DialogTitle>
 
         {isEdit ? (
@@ -124,21 +148,30 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>ФИО</label>
               <Input placeholder='ФИО' {...editForm.register('full_name')} />
-              {editForm.formState.errors.full_name?.message ? (
-                <div className='text-xs text-red-600'>{editForm.formState.errors.full_name.message.toString()}</div>
-              ) : null}
+              {editForm.formState.errors.full_name?.message ? <div className='text-xs text-red-600'>{editForm.formState.errors.full_name.message.toString()}</div> : null}
             </div>
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>Email</label>
               <Input type='email' placeholder='Email' {...editForm.register('email')} />
-              {editForm.formState.errors.email?.message ? (
-                <div className='text-xs text-red-600'>{editForm.formState.errors.email.message.toString()}</div>
-              ) : null}
+            </div>
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Телефон</label>
+                <Input placeholder='+7 ...' {...editForm.register('phone')} />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Отдел</label>
+                <Input placeholder='Кардиология' {...editForm.register('department')} />
+              </div>
             </div>
             <div className='flex flex-col gap-1'>
-              <label className='text-xs font-medium text-muted-foreground'>Роль пользователя</label>
+              <label className='text-xs font-medium text-muted-foreground'>Специализация</label>
+              <Input placeholder='Терапевт' {...editForm.register('specialization')} />
+            </div>
+            <div className='flex flex-col gap-1'>
+              <label className='text-xs font-medium text-muted-foreground'>Роль</label>
               <Select value={editForm.watch('role')} onValueChange={(value) => editForm.setValue('role', value as 'admin' | 'registrar' | 'doctor' | 'nurse')}>
-                <SelectTrigger><SelectValue placeholder='Выберите роль...' /></SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value='admin'>Администратор</SelectItem>
                   <SelectItem value='registrar'>Регистратор</SelectItem>
@@ -146,14 +179,13 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
                   <SelectItem value='nurse'>Медсестра</SelectItem>
                 </SelectContent>
               </Select>
-              {editForm.formState.errors.role?.message ? (
-                <div className='text-xs text-red-600'>{editForm.formState.errors.role.message.toString()}</div>
-              ) : null}
             </div>
             <label className='flex items-center gap-2 text-sm'>
               <input type='checkbox' checked={editForm.watch('is_active')} onChange={(e) => editForm.setValue('is_active', e.target.checked)} />
               Активен
             </label>
+
+            {/* Google user — generate password */}
             {user?.is_google_user && (
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-2">
                 <p className="text-xs font-medium text-blue-800">Аккаунт Google — пароль не установлен</p>
@@ -172,6 +204,22 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
                 )}
               </div>
             )}
+
+            {/* Admin: reset password for any user */}
+            <div className="rounded-lg border border-slate-200 p-3 space-y-2">
+              <button type="button" onClick={() => setShowResetPassword(!showResetPassword)} className="flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">
+                <RotateCcw className="h-3.5 w-3.5" /> Сбросить пароль
+              </button>
+              {showResetPassword && (
+                <div className="flex gap-2">
+                  <Input type="password" placeholder="Новый пароль" value={resetNewPassword} onChange={(e) => setResetNewPassword(e.target.value)} className="flex-1" />
+                  <Button type="button" variant="outline" size="sm" onClick={handleResetPassword} disabled={resetNewPassword.length < 6}>
+                    Сбросить
+                  </Button>
+                </div>
+              )}
+            </div>
+
             <Button type='submit' className='w-full' disabled={updateMutation.isPending}>
               {updateMutation.isPending ? 'Сохранение...' : 'Сохранить'}
             </Button>
@@ -181,21 +229,29 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>ФИО</label>
               <Input placeholder='ФИО' {...createForm.register('full_name')} />
-              {createForm.formState.errors.full_name?.message ? (
-                <div className='text-xs text-red-600'>{createForm.formState.errors.full_name.message.toString()}</div>
-              ) : null}
             </div>
             <div className='flex flex-col gap-1'>
               <label className='text-xs font-medium text-muted-foreground'>Email</label>
               <Input type='email' placeholder='Email' {...createForm.register('email')} />
-              {createForm.formState.errors.email?.message ? (
-                <div className='text-xs text-red-600'>{createForm.formState.errors.email.message.toString()}</div>
-              ) : null}
+            </div>
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Телефон</label>
+                <Input placeholder='+7 ...' {...createForm.register('phone')} />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Отдел</label>
+                <Input placeholder='Кардиология' {...createForm.register('department')} />
+              </div>
             </div>
             <div className='flex flex-col gap-1'>
-              <label className='text-xs font-medium text-muted-foreground'>Роль пользователя</label>
+              <label className='text-xs font-medium text-muted-foreground'>Специализация</label>
+              <Input placeholder='Терапевт' {...createForm.register('specialization')} />
+            </div>
+            <div className='flex flex-col gap-1'>
+              <label className='text-xs font-medium text-muted-foreground'>Роль</label>
               <Select value={createForm.watch('role')} onValueChange={(value) => createForm.setValue('role', value as 'admin' | 'registrar' | 'doctor' | 'nurse')}>
-                <SelectTrigger><SelectValue placeholder='Выберите роль...' /></SelectTrigger>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value='admin'>Администратор</SelectItem>
                   <SelectItem value='registrar'>Регистратор</SelectItem>
@@ -203,23 +259,16 @@ export const UserModal = ({ open, onOpenChange, user }: UserModalProps) => {
                   <SelectItem value='nurse'>Медсестра</SelectItem>
                 </SelectContent>
               </Select>
-              {createForm.formState.errors.role?.message ? (
-                <div className='text-xs text-red-600'>{createForm.formState.errors.role.message.toString()}</div>
-              ) : null}
             </div>
-            <div className='flex flex-col gap-1'>
-              <label className='text-xs font-medium text-muted-foreground'>Пароль</label>
-              <Input type='password' placeholder='Пароль' {...createForm.register('password')} />
-              {createForm.formState.errors.password?.message ? (
-                <div className='text-xs text-red-600'>{createForm.formState.errors.password.message.toString()}</div>
-              ) : null}
-            </div>
-            <div className='flex flex-col gap-1'>
-              <label className='text-xs font-medium text-muted-foreground'>Подтверждение пароля</label>
-              <Input type='password' placeholder='Подтвердить пароль' {...createForm.register('confirmPassword')} />
-              {createForm.formState.errors.confirmPassword?.message ? (
-                <div className='text-xs text-red-600'>{createForm.formState.errors.confirmPassword.message.toString()}</div>
-              ) : null}
+            <div className='grid grid-cols-2 gap-3'>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Пароль</label>
+                <Input type='password' placeholder='Пароль' {...createForm.register('password')} />
+              </div>
+              <div className='flex flex-col gap-1'>
+                <label className='text-xs font-medium text-muted-foreground'>Подтверждение</label>
+                <Input type='password' placeholder='Повторите' {...createForm.register('confirmPassword')} />
+              </div>
             </div>
             <label className='flex items-center gap-2 text-sm'>
               <input type='checkbox' checked={createForm.watch('is_active')} onChange={(e) => createForm.setValue('is_active', e.target.checked)} />

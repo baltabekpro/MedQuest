@@ -28,6 +28,11 @@ class TwoFactorSetupResponse(BaseModel):
 
 class TwoFactorVerifyRequest(BaseModel):
     code: str = Field(min_length=6, max_length=6)
+    email: str | None = None
+
+
+class SetPasswordRequest(BaseModel):
+    new_password: str = Field(min_length=6)
 
 
 class LoginEventResponse(BaseModel):

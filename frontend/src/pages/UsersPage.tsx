@@ -1,5 +1,6 @@
 import { Pencil, Plus, Trash } from 'lucide-react'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useDebounce } from '@/hooks/useDebounce'
 import { useUserMutations, useUsers } from '@/hooks/useUsers'
 import { Badge } from '@/components/ui/badge'
@@ -19,7 +20,8 @@ const roleClass: Record<string, string> = {
 }
 
 export const UsersPage = () => {
-  const [tab, setTab] = useState<'all' | 'admin' | 'registrar' | 'doctor'>('all')
+  const navigate = useNavigate()
+  const [tab, setTab] = useState<'all' | 'admin' | 'registrar' | 'doctor' | 'nurse'>('all')
   const [search, setSearch] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<import('@/types/api').UserResponse | undefined>()
@@ -55,7 +57,7 @@ export const UsersPage = () => {
           {items.map((user) => (
             <TableRow key={user.id}>
               <TableCell>{user.id}</TableCell>
-              <TableCell>{user.full_name}</TableCell>
+              <TableCell><button type='button' className='text-left font-medium text-blue-600 hover:underline' onClick={() => navigate(`/users/${user.id}/profile`)}>{user.full_name}</button></TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell><Badge className={roleClass[user.role]}>{roleLabel[user.role]}</Badge></TableCell>
               <TableCell><Badge className={user.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>{user.is_active ? 'Активен' : 'Неактивен'}</Badge></TableCell>

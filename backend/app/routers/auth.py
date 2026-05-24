@@ -24,6 +24,7 @@ from app.schemas.auth import (
     ChangePasswordRequest,
     LoginEventResponse,
     MessageResponse,
+    SetPasswordRequest,
     TwoFactorSetupResponse,
     TwoFactorVerifyRequest,
     UpdateProfileRequest,
@@ -185,15 +186,24 @@ def google_login(payload: GoogleLoginRequest, request: Request, db: Session = De
 @router.post("/google-login/verify-2fa", response_model=LoginResponse)
 def google_login_verify_2fa(payload: TwoFactorVerifyRequest, request: Request, db: Session = Depends(get_db)):
     """Second step for Google users with 2FA enabled — verify TOTP and return tokens."""
-    # We need email from the token code to find the user — but we don't have it.
-    # Instead, we'll accept email in the request.
-    raise HTTPException(status_code=501, detail="Not implemented — use regular login for 2FA Google users")
+    if not payload.email:
+        raise HTTPException(status_code=400, detail="Email обязателен для 2FA верификации Google")
+    user = db.query(User).filter(User.email == payload.email).first()
+    if not user or not user.is_2fa_enabled or not user.totp_secret:
+        raise HTTPException(status_code=400, detail="2FA не настроена")
+    totp = pyotp.TOTP(user.totp_secret)
+    if not totp.verify(payload.code, valid_window=1):
+        raise HTTPException(status_code=400, detail="Неверный код")
+    _record_login_event(db, user_id=user.id, ip_address=request.client.host if request.client else None,
+                        user_agent=request.headers.get("user-agent"), success=True)
+    subject = str(user.id)
+    return LoginResponse(access_token=create_access_token(subject), refresh_token=create_refresh_token(subject))
 
 
 @router.post("/select-role", response_model=TokenPair)
 def select_role(payload: SelectRoleRequest, request: Request, db: Session = Depends(get_db)):
     """New Google user selects their role after first login."""
-    allowed_roles = {"admin", "registrar", "doctor", "nurse"}
+    allowed_roles = {"registrar", "doctor", "nurse"}
     if payload.role not in allowed_roles:
         raise HTTPException(status_code=400, detail=f"Недопустимая роль. Допустимые: {', '.join(allowed_roles)}")
 
@@ -318,6 +328,31 @@ def change_password(
         details={"password_changed": True},
     )
     return MessageResponse(message="Пароль успешно изменён")
+
+
+@router.post("/set-password", response_model=MessageResponse)
+def set_password(
+    payload: SetPasswordRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Set password for Google users who want to create one."""
+    current_user.hashed_password = get_password_hash(payload.new_password)
+    current_user.is_google_user = False
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"password_set": True},
+    )
+    return MessageResponse(message="Пароль успешно установлен")
 
 
 @router.post("/2fa/enable", response_model=TwoFactorSetupResponse)
@@ -453,6 +488,26 @@ def get_sessions(
         )
         for row in rows
     ]
+
+
+@router.post("/set-password", response_model=MessageResponse)
+def set_password(
+    payload: SetPasswordRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Any user (including Google users) can set their own password."""
+    current_user.hashed_password = get_password_hash(payload.new_password)
+    current_user.is_google_user = False
+    db.commit()
+    create_audit_log(
+        db, user_id=current_user.id, user_full_name=current_user.full_name,
+        action="UPDATE", entity_type="User", entity_id=current_user.id,
+        ip_address=request.client.host if request.client else None,
+        details={"password_set": True},
+    )
+    return MessageResponse(message="Пароль установлен")
 
 
 @router.post("/logout", response_model=MessageResponse)

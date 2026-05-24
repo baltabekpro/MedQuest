@@ -53,3 +53,12 @@ export const selectRole = async (temp_token: string, role: string) => {
   const { data } = await api.post<TokenPair>('/auth/select-role', { temp_token, role })
   return data
 }
+
+export const googleLoginVerify2fa = async (email: string, code: string) => {
+  const { data } = await api.post<LoginResponse>('/auth/google-login/verify-2fa', { email, code })
+  return data
+}
+
+export const setPassword = async (new_password: string) => {
+  await api.post('/auth/set-password', { new_password })
+}

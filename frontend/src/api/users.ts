@@ -9,6 +9,11 @@ export const listUsers = async (params?: Record<string, string | number | undefi
   return data
 }
 
+export const getUser = async (id: number) => {
+  const { data } = await api.get<UserResponse>(`/users/${id}`)
+  return data
+}
+
 export const createUser = async (payload: {
   full_name: string
   email: string
@@ -31,5 +36,17 @@ export const deleteUser = async (id: number) => {
 
 export const generatePassword = async (id: number) => {
   const { data } = await api.post<{ password: string }>(`/users/${id}/generate-password`)
+  return data
+}
+
+export const resetPassword = async (id: number, new_password: string) => {
+  const { data } = await api.post<{ password: string }>(`/users/${id}/reset-password`, { new_password })
+  return data
+}
+
+export const uploadAvatar = async (id: number, file: File) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await api.post<{ avatar_url: string }>(`/users/${id}/avatar`, formData)
   return data
 }

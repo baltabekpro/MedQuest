@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Shield } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getMe, googleLogin, login, selectRole } from '@/api/auth'
+import { getMe, googleLogin, googleLoginVerify2fa, login, selectRole } from '@/api/auth'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,6 @@ declare global {
 }
 
 const roleOptions = [
-  { value: 'admin', label: 'Администратор', desc: 'Полный доступ к системе' },
   { value: 'doctor', label: 'Врач', desc: 'Приёмы, пациенты, расписание' },
   { value: 'nurse', label: 'Медсестра', desc: 'Помощь врачам, расписание' },
   { value: 'registrar', label: 'Регистратор', desc: 'Регистрация пациентов, заявки' },
@@ -40,10 +39,12 @@ export const LoginPage = () => {
   const [error, setError] = useState('')
   const [requires2fa, setRequires2fa] = useState(false)
   const [totpCode, setTotpCode] = useState('')
+  const [googleEmail, setGoogleEmail] = useState('')
   const [roleSelectOpen, setRoleSelectOpen] = useState(false)
   const [tempToken, setTempToken] = useState('')
   const [selectedRole, setSelectedRole] = useState('')
   const [roleSubmitting, setRoleSubmitting] = useState(false)
+  const [google2fa, setGoogle2fa] = useState(false)
   const googleBtnRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -72,7 +73,13 @@ export const LoginPage = () => {
           return
         }
         if (result.requires_2fa) {
-          setError('Для этого аккаунта включена 2FA. Войдите через email/пароль.')
+          // Need email to verify 2FA — decode from JWT or ask backend
+          // For now, use the Google credential to get email by decoding the JWT
+          try {
+            const payload = JSON.parse(atob(credential.split('.')[1]))
+            setGoogleEmail(payload.email)
+          } catch { /* ignore */ }
+          setRequires2fa(true)
           return
         }
         if (result.access_token && result.refresh_token) {
@@ -125,7 +132,15 @@ export const LoginPage = () => {
     setError('')
     setIsSubmitting(true)
     try {
-      const result = await login(email, password, requires2fa ? totpCode : undefined)
+      let result
+      if (requires2fa && googleEmail) {
+        // Google user with 2FA — verify via dedicated endpoint
+        result = await googleLoginVerify2fa(googleEmail, totpCode)
+      } else if (requires2fa) {
+        result = await login(email, password, totpCode)
+      } else {
+        result = await login(email, password)
+      }
       if (result.requires_2fa) {
         setRequires2fa(true)
         return
@@ -208,7 +223,7 @@ export const LoginPage = () => {
               <button
                 type='button'
                 className='text-xs text-muted hover:text-primary'
-                onClick={() => { setRequires2fa(false); setTotpCode(''); setError('') }}
+                onClick={() => { setRequires2fa(false); setTotpCode(''); setGoogleEmail(''); setError('') }}
               >
                 Назад к входу
               </button>

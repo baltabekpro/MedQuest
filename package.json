@@ -1,0 +1,12 @@
+{
+  "name": "medquest-report",
+  "version": "1.0.0",
+  "description": "Report generator for MedQuest pre-diploma practice",
+  "main": "report.js",
+  "scripts": {
+    "generate": "node report.js"
+  },
+  "dependencies": {
+    "docx": "^8.5.0"
+  }
+}

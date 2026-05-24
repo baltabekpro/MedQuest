@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { changePassword, getMe, getSessions, updateMe } from '@/api/auth'
+import { changePassword, getMe, getSessions, setPassword, updateMe } from '@/api/auth'
+import { uploadAvatar } from '@/api/users'
 import { useAuthStore } from '@/store/authStore'
 import { TwoFactorSetup } from '@/components/TwoFactorSetup'
 import { Button } from '@/components/ui/button'
@@ -40,6 +41,8 @@ export const ProfilePage = () => {
   const [fullName, setFullName] = useState(user?.full_name ?? '')
   const [phone, setPhone] = useState(user?.phone ?? '')
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar_url ?? '')
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [department, setDepartment] = useState(user?.department ?? '')
   const [specialization, setSpecialization] = useState(user?.specialization ?? '')
   const [oldPassword, setOldPassword] = useState('')
@@ -57,6 +60,20 @@ export const ProfilePage = () => {
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) return '—'
     return date.toLocaleString('ru-RU')
+  }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file || !user) return
+    try {
+      const result = await uploadAvatar(user.id, file)
+      setAvatarUrl(result.avatar_url)
+      const updated = await getMe()
+      setUser(updated)
+      toast.success('Аватар обновлён')
+    } catch {
+      toast.error('Ошибка загрузки аватара')
+    }
   }
 
   const handleSaveProfile = async () => {
@@ -85,10 +102,10 @@ export const ProfilePage = () => {
         <div className="flex flex-col sm:flex-row gap-4">
           {/* Аватар */}
           <div className="flex flex-col items-center gap-2">
-            <div className="relative group">
+            <label className="relative group cursor-pointer">
               {avatarUrl ? (
                 <img
-                  src={avatarUrl}
+                  src={avatarUrl.startsWith('http') ? avatarUrl : `${(import.meta.env.VITE_API_URL || 'https://172-207-57-215.sslip.io/medquest').replace(/\/$/, '')}${avatarUrl}`}
                   alt="Avatar"
                   className="h-20 w-20 rounded-full object-cover ring-2 ring-blue-100"
                 />
@@ -97,16 +114,12 @@ export const ProfilePage = () => {
                   {fullName?.charAt(0)?.toUpperCase() || 'U'}
                 </div>
               )}
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
                 <Camera className="h-5 w-5 text-white" />
               </div>
-            </div>
-            <Input
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="URL аватара"
-              className="w-48 text-xs"
-            />
+              <input type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            </label>
+            <span className="text-xs text-muted">Нажмите для загрузки</span>
           </div>
 
           {/* Поля */}
@@ -146,12 +159,17 @@ export const ProfilePage = () => {
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Безопасность</h2>
         {user?.is_google_user ? (
-          <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-4">
-            <Globe className="h-5 w-5 text-blue-600 shrink-0" />
-            <div>
-              <p className="text-sm font-medium text-blue-900">Аккаунт создан через Google</p>
-              <p className="text-xs text-blue-700">Пароль не установлен. Обратитесь к администратору для создания пароля.</p>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 rounded-lg bg-blue-50 p-3">
+              <Globe className="h-5 w-5 text-blue-600 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-blue-900">Аккаунт создан через Google</p>
+                <p className="text-xs text-blue-700">Вы можете установить пароль для входа через email</p>
+              </div>
             </div>
+            <Input type="password" placeholder="Новый пароль (мин. 6 символов)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            <p className="text-sm text-muted">Надежность: {passwordStrength(newPassword)}</p>
+            <Button onClick={async () => { await setPassword(newPassword); toast.success('Пароль установлен') }} disabled={newPassword.length < 6}>Установить пароль</Button>
           </div>
         ) : (
           <div className="space-y-2">

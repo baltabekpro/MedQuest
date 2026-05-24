@@ -1,12 +1,15 @@
+import os
 import secrets
 import string
+from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, UploadFile, File, status
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
-from app.core.deps import require_roles
+from app.core.deps import get_current_user, require_roles
 from app.core.security import get_password_hash
 from app.database import get_db
 from app.models.user import User
@@ -17,6 +20,17 @@ from app.services.audit_service import create_audit_log
 
 class GeneratedPasswordResponse(BaseModel):
     password: str
+
+
+class ResetPasswordRequest(BaseModel):
+    new_password: str
+
+
+class AvatarResponse(BaseModel):
+    avatar_url: str
+
+
+UPLOAD_DIR = "/app/uploads/avatars"
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -50,7 +64,7 @@ def list_users(
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
-    _: User = Depends(require_roles("admin")),
+    _: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     user = db.query(User).filter(User.id == user_id).first()
@@ -185,3 +199,72 @@ def generate_password(
     )
 
     return GeneratedPasswordResponse(password=password)
+
+
+@router.post("/{user_id}/reset-password", response_model=GeneratedPasswordResponse)
+def reset_password(
+    user_id: int,
+    payload: ResetPasswordRequest,
+    request: Request,
+    current_user: User = Depends(require_roles("admin")),
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.hashed_password = get_password_hash(payload.new_password)
+    if user.is_google_user:
+        user.is_google_user = False
+    db.commit()
+
+    create_audit_log(
+        db,
+        user_id=current_user.id,
+        user_full_name=current_user.full_name,
+        action="UPDATE",
+        entity_type="User",
+        entity_id=user.id,
+        ip_address=request.client.host if request and request.client else None,
+        details={"password_reset": True},
+    )
+
+    return GeneratedPasswordResponse(password=payload.new_password)
+
+
+@router.post("/{user_id}/avatar", response_model=AvatarResponse)
+async def upload_avatar(
+    user_id: int,
+    file: UploadFile = File(...),
+    request: Request = None,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if current_user.role != "admin" and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Нет прав для загрузки аватара этого пользователя")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not file.content_type or not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Файл должен быть изображением")
+
+    os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+    ext = file.filename.split(".")[-1] if file.filename and "." in file.filename else "jpg"
+    filename = f"{user_id}_{int(datetime.now().timestamp())}.{ext}"
+    filepath = os.path.join(UPLOAD_DIR, filename)
+
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="Файл слишком большой (макс. 5 МБ)")
+
+    with open(filepath, "wb") as f:
+        f.write(content)
+
+    avatar_url = f"/uploads/avatars/{filename}"
+    user.avatar_url = avatar_url
+    db.commit()
+
+    return AvatarResponse(avatar_url=avatar_url)

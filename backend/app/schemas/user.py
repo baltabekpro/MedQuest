@@ -15,8 +15,13 @@ class UserCreate(UserBase):
 
 class UserUpdate(BaseModel):
     full_name: str | None = None
+    email: EmailStr | None = None
     role: str | None = None
     is_active: bool | None = None
+    phone: str | None = None
+    avatar_url: str | None = None
+    department: str | None = None
+    specialization: str | None = None
 
 
 class UserResponse(UserBase):

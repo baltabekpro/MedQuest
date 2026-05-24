@@ -1,0 +1,189 @@
+Техническое задание на модернизацию информационной системы MedQuest (Enterprise-модернизация)
+
+1. Общие сведения и архитектура системы
+
+Настоящее техническое задание (ТЗ) определяет требования к модернизации медицинской информационной системы (МИС) MedQuest. Целью модернизации является расширение базовой CRUD-архитектуры до уровня масштабируемого веб-приложения за счет внедрения асинхронного взаимодействия в реальном времени, интеграции внешних протоколов авторизации, использования современных стандартов безопасности и интеллектуальной маршрутизации на базе искусственного интеллекта.
+
+Система полностью закрыта от внешних пользователей (пациентов). Все операции по регистрации медицинских карт, ведению приемов и планированию расписания осуществляются исключительно авторизованным персоналом клиники (регистраторами, врачами, администрацией).
+
+1.1. Общий стек технологий модернизированной версии
+
+Backend: FastAPI (Python), SQLAlchemy (Async ORM), PostgreSQL (СУБД), WebSockets (асинхронный двунаправленный протокол), Uvicorn (ASGI-сервер), Python-библиотеки: google-generativeai, pyotp, qrcode.
+
+Frontend: React (SPA), TailwindCSS, TypeScript (типизация), @react-oauth/google (авторизация сотрудников), FullCalendar (компонент планировщика).
+
+2. Модуль 1. Интеллектуальный классификатор симптомов (Маршрутизатор на базе Google Gemini)
+
+2.1. Назначение модуля
+
+Модуль представляет собой рабочую панель для оператора колл-центра или регистратора. При обращении пациента регистратор вводит жалобы в свободном текстовом формате. Система, используя LLM Google Gemini в режиме Structured Outputs, анализирует текст и выдает рекомендацию, к какому узкому специалисту направить пациента.
+
+2.2. Архитектура и логика работы
+
+Ввод данных: Регистратор вводит жалобу в интерфейсе.
+
+Формирование контекста: FastAPI упаковывает текст в промпт.
+
+Structured Outputs (Pydantic): Ответ жестко валидируется через Pydantic-схемы.
+
+Обработка: Система подсвечивает специалиста и предлагает открыть расписание.
+
+2.3. Пример реализации (FastAPI)
+
+import os
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import google.generativeai as genai
+
+app = FastAPI()
+
+GEMINI_API_KEY = "YOUR_API_KEY"
+genai.configure(api_key=GEMINI_API_KEY)
+
+class AlternativeSpecialty(BaseModel):
+    specialty_id: int
+    specialty_name: str
+    confidence: float
+
+class RoutingResponse(BaseModel):
+    recommended_specialty_id: int
+    recommended_specialty_name: str
+    confidence: float = Field(description="Уверенность модели от 0.0 до 1.0")
+    alternative_specialties: list[AlternativeSpecialty]
+
+class ComplaintRequest(BaseModel):
+    complaint_text: str
+
+@app.post("/api/v1/classifier/route-complaint", response_model=RoutingResponse)
+async def route_complaint(request: ComplaintRequest):
+    try:
+        model = genai.GenerativeModel('gemini-3.5-flash')
+        prompt = f"""
+        Ты — медицинский координатор. Определи специализацию для жалобы: "{request.complaint_text}"
+        Список отделений: 1-Терапевт, 2-Офтальмолог, 3-Кардиолог, 4-Невролог, 5-ЛОР, 6-Травматолог.
+        Верни строго JSON-структуру по схеме RoutingResponse.
+        """
+        response = model.generate_content(
+            prompt,
+            generation_config={"response_mime_type": "application/json", "response_schema": RoutingResponse}
+        )
+        return RoutingResponse.model_validate_json(response.text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+3. Модуль 2. Корпоративный чат (WebSocket Staff Chat)
+
+3.1. Архитектура
+
+Реализован ConnectionManager на FastAPI для управления активными сессиями пользователей.
+
+3.2. Структура БД (PostgreSQL)
+
+CREATE TABLE staff_messages (
+    id SERIAL PRIMARY KEY,
+    sender_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    message_text TEXT NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_delivered BOOLEAN DEFAULT FALSE,
+    is_read BOOLEAN DEFAULT FALSE
+);
+
+
+4. Модуль 3. Безопасность и Интеграции
+
+4.1. Двухфакторная аутентификация (2FA)
+
+Реализация по стандарту RFC 6238.
+Одноразовый код $TOTP$ рассчитывается по формуле:
+
+
+$$T = \left\lfloor \frac{T_{\text{current}} - T_0}{T_x} \right\rfloor$$
+
+$$HOTP(K, T) = \text{Truncate}(\text{HMAC-SHA-1}(K, T)) \pmod{10^6}$$
+
+
+где $T_x = 30$ секунд.
+
+4.2. Продвинутый аудит данных
+
+Таблица audit_logs для отслеживания всех изменений в БД:
+
+CREATE TABLE audit_logs (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    action_type VARCHAR(50) NOT NULL,
+    target_table VARCHAR(100) NOT NULL,
+    target_id INT NOT NULL,
+    old_value JSONB,
+    new_value JSONB,
+    ip_address VARCHAR(45),
+    timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+
+5. Модуль 4. Интерактивный UI/UX и Телемедицина
+
+5.1. Видеоконсультации (P2P Jitsi)
+
+Уникальный идентификатор комнаты генерируется на бэкенде:
+
+
+$$RoomID = \text{SHA-256}(DoctorID + PatientID + Date)$$
+
+5.2. Интерактивный календарь (Scheduler)
+
+Проверка на коллизию (пересечение интервалов):
+
+
+$$\text{NewStart} < \text{ExistEnd} \quad \text{AND} \quad \text{NewEnd} > \text{ExistStart}$$
+
+6. Модуль 5. Профили сотрудников и пациентов
+
+6.1. Структура базы данных
+
+Используется разделение на users (персонал) и patients (медицинские карты).
+
+CREATE TYPE employee_role AS ENUM ('DOCTOR', 'REGISTRAR', 'ADMIN');
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password_hash VARCHAR(256) NOT NULL,
+    role employee_role NOT NULL DEFAULT 'REGISTRAR'
+);
+
+CREATE TABLE patients (
+    id SERIAL PRIMARY KEY,
+    iin VARCHAR(12) UNIQUE NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    date_of_birth DATE NOT NULL
+);
+
+
+7. Инфраструктура сервера (Deployment)
+
+Сервер находится в исходном состоянии (пустой инстанс). Для обеспечения безопасного доступа и автоматизации развертывания настроена аутентификация по SSH-ключам.
+
+7.1. Настройка SSH
+
+Публичный ключ: Ключ id_ed25519.pub добавлен на сервер в файл ~/.ssh/authorized_keys.
+
+Конфигурация клиента: В локальный файл ~/.ssh/config добавлена запись для быстрого доступа:
+
+Host work
+    HostName 172.207.57.215
+    User work
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+
+
+7.2. Команда подключения
+
+Для подключения к серверу используется команда:
+ssh work
+
+Аутентификация происходит автоматически по ключу, ввод пароля не требуется.

@@ -64,7 +64,10 @@ def list_appointments(
     db: Session = Depends(get_db),
 ):
     q = db.query(Appointment)
-    if doctor_id:
+    # Privacy: doctor/nurse see only their own appointments
+    if current_user.role in ("doctor", "nurse"):
+        q = q.filter(Appointment.doctor_id == current_user.id)
+    elif doctor_id:
         q = q.filter(Appointment.doctor_id == doctor_id)
     if date_from:
         q = q.filter(Appointment.start_time >= date_from)

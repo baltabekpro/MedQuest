@@ -13,6 +13,7 @@ import { RequestDetailPage } from '@/pages/RequestDetailPage'
 import { RequestsPage } from '@/pages/RequestsPage'
 import { SchedulePage } from '@/pages/SchedulePage'
 import { UsersPage } from '@/pages/UsersPage'
+import { UserProfilePage } from '@/pages/UserProfilePage'
 import { useAuthStore } from '@/store/authStore'
 
 function PrivateRoute() {
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
           { path: '/requests', element: <RequestsPage /> },
           { path: '/requests/:id', element: <RequestDetailPage /> },
           { path: '/profile', element: <ProfilePage /> },
+          { path: '/users/:id/profile', element: <UserProfilePage /> },
           {
             element: <AdminRoute />,
             children: [
