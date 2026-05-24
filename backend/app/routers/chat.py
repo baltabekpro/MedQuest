@@ -142,7 +142,7 @@ def get_contacts(
             last_message_at=last_msg.sent_at if last_msg else None,
             unread_count=unread,
         ))
-    contacts.sort(key=lambda c: c.last_message_at or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    contacts.sort(key=lambda c: c.last_message_at or datetime.min, reverse=True)
     return contacts
 
 
