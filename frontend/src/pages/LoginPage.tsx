@@ -57,7 +57,7 @@ export const LoginPage = () => {
     navigate('/dashboard')
   }
 
-  const googleCallbackRef = useRef<(credential: string) => void>()
+  const googleCallbackRef = useRef<(credential: string) => void>(undefined)
 
   useEffect(() => {
     googleCallbackRef.current = async (credential: string) => {

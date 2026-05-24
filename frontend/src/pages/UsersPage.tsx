@@ -11,10 +11,11 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserModal } from '@/components/modals/UserModal'
 import { roleLabel } from '@/utils/roleLabel'
 
-const roleClass = {
+const roleClass: Record<string, string> = {
   admin: 'bg-purple-100 text-purple-800',
   registrar: 'bg-blue-100 text-blue-800',
   doctor: 'bg-teal-100 text-teal-800',
+  nurse: 'bg-green-100 text-green-800',
 }
 
 export const UsersPage = () => {

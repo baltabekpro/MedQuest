@@ -64,8 +64,9 @@ export const AppointmentModal = ({ open, onClose, appointment, defaultDate, onSt
     }
   }, [appointment, defaultDate])
 
-  const staff = (users.data ?? []).filter((u: any) => ['doctor', 'nurse'].includes(u.role))
-  const patientList = (patients.data ?? []) as any[]
+  const allUsers = Array.isArray(users.data) ? users.data : (users.data?.items ?? [])
+  const staff = allUsers.filter((u: any) => ['doctor', 'nurse'].includes(u.role))
+  const patientList: any[] = Array.isArray(patients.data) ? patients.data : ((patients.data as any)?.items ?? [])
 
   const handleSave = () => {
     if (!doctorId || !patientId || !title || !startDate || !startTime) {
