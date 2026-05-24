@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/store/authStore'
 import { getApiErrorMessage } from '@/utils/errorMessage'
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const GOOGLE_CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID || '').trim()
 
 declare global {
   interface Window {
