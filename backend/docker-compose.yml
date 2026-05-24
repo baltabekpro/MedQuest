@@ -9,6 +9,7 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - CORS_ORIGINS=${CORS_ORIGINS:-}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     volumes:
       - medquest_data:/app/data
     networks:
