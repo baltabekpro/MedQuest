@@ -47,6 +47,8 @@ export const resetPassword = async (id: number, new_password: string) => {
 export const uploadAvatar = async (id: number, file: File) => {
   const formData = new FormData()
   formData.append('file', file)
-  const { data } = await api.post<{ avatar_url: string }>(`/users/${id}/avatar`, formData)
+  const { data } = await api.post<{ avatar_url: string }>(`/users/${id}/avatar`, formData, {
+    headers: { 'Content-Type': null },
+  })
   return data
 }
