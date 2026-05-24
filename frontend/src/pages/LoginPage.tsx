@@ -99,7 +99,7 @@ export const LoginPage = () => {
     window.google.accounts.id.renderButton(googleBtnRef.current, {
       theme: 'outline',
       size: 'large',
-      width: '100%',
+      width: googleBtnRef.current.offsetWidth || 380,
       text: 'continue_with',
       shape: 'pill',
       locale: 'ru',
@@ -184,7 +184,7 @@ export const LoginPage = () => {
 
               <div className='relative'>
                 <label className='mb-2 block text-sm font-medium text-slate-700'>Пароль</label>
-                <Input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Введите пароль' required />
+                <Input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Введите пароль' required autoComplete='current-password' />
                 <button type='button' aria-label='Показать/скрыть пароль' className='absolute right-3 top-3 text-muted' onClick={() => setShowPassword((v) => !v)}>
                   {showPassword ? <EyeOff className='h-4 w-4' /> : <Eye className='h-4 w-4' />}
                 </button>
