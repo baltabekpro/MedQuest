@@ -104,6 +104,21 @@ async def websocket_chat(websocket: WebSocket, token: str):
         manager.disconnect(user_id, websocket)
 
 
+# ── REST: get staff list (for new chat picker) ────────────────────────────────
+@router.get("/chat/staff")
+def get_staff(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    users = (
+        db.query(User)
+        .filter(User.is_active.is_(True), User.id != current_user.id)
+        .order_by(User.full_name)
+        .all()
+    )
+    return [{"id": u.id, "full_name": u.full_name, "role": u.role} for u in users]
+
+
 # ── REST: get contacts ─────────────────────────────────────────────────────────
 @router.get("/chat/contacts", response_model=list[ChatContact])
 def get_contacts(

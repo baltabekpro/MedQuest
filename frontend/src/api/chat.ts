@@ -19,6 +19,12 @@ export interface ChatMessage {
   is_read: boolean
 }
 
+export interface StaffMember {
+  id: number
+  full_name: string
+  role: string
+}
+
 export async function getContacts(): Promise<ChatContact[]> {
   const { data } = await api.get('/chat/contacts')
   return data
@@ -26,5 +32,10 @@ export async function getContacts(): Promise<ChatContact[]> {
 
 export async function getMessages(userId: number): Promise<ChatMessage[]> {
   const { data } = await api.get(`/chat/messages/${userId}`)
+  return data
+}
+
+export async function getStaff(): Promise<StaffMember[]> {
+  const { data } = await api.get('/chat/staff')
   return data
 }

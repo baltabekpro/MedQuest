@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { getContacts, getMessages, type ChatMessage, type ChatContact } from '@/api/chat'
+import { getContacts, getMessages, getStaff, type ChatMessage, type ChatContact, type StaffMember } from '@/api/chat'
 import { useAuthStore } from '@/store/authStore'
 
 const WS_BASE = (import.meta.env.VITE_API_URL || 'https://172-207-57-215.sslip.io/medquest').replace(/^http/, 'ws')
@@ -16,6 +16,11 @@ export function useChat() {
     queryKey: ['chat', 'contacts'],
     queryFn: getContacts,
     refetchInterval: 10000,
+  })
+
+  const staff = useQuery<StaffMember[]>({
+    queryKey: ['chat', 'staff'],
+    queryFn: getStaff,
   })
 
   const history = useQuery<ChatMessage[]>({
@@ -63,15 +68,24 @@ export function useChat() {
 
   const selectContact = useCallback((userId: number) => {
     setActiveUserId(userId)
-  }, [])
+    queryClient.invalidateQueries({ queryKey: ['chat', 'contacts'] })
+  }, [queryClient])
+
+  const startChat = useCallback((userId: number) => {
+    setActiveUserId(userId)
+    queryClient.invalidateQueries({ queryKey: ['chat', 'contacts'] })
+  }, [queryClient])
 
   return {
     contacts: contacts.data ?? [],
     contactsLoading: contacts.isLoading,
+    staff: staff.data ?? [],
+    staffLoading: staff.isLoading,
     messages: wsMessages,
     messagesLoading: history.isLoading,
     activeUserId,
     selectContact,
     sendMessage,
+    startChat,
   }
 }
