@@ -14,3 +14,4 @@ google-auth>=2.35.0
 pyotp>=2.9.0
 qrcode>=7.4
 Pillow>=10.0
+aiofiles>=24.1.0
