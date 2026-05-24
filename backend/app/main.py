@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
@@ -61,7 +60,6 @@ app.include_router(chat.router)
 app.include_router(schedule.router)
 
 os.makedirs("/app/uploads/avatars", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 def seed_admin_user() -> None:
     db: Session = SessionLocal()

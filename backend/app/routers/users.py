@@ -4,7 +4,8 @@ import string
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response, UploadFile, File, status
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
 from pydantic import BaseModel
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
@@ -268,3 +269,16 @@ async def upload_avatar(
     db.commit()
 
     return AvatarResponse(avatar_url=avatar_url)
+
+
+@router.get("/{user_id}/avatar")
+def get_avatar(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or not user.avatar_url:
+        raise HTTPException(status_code=404, detail="Avatar not found")
+
+    filepath = os.path.join("/app", user.avatar_url.lstrip("/"))
+    if not os.path.isfile(filepath):
+        raise HTTPException(status_code=404, detail="Avatar file not found")
+
+    return FileResponse(filepath, media_type="image/png")

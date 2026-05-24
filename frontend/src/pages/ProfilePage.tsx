@@ -105,7 +105,7 @@ export const ProfilePage = () => {
             <label className="relative group cursor-pointer">
               {avatarUrl ? (
                 <img
-                  src={avatarUrl.startsWith('http') ? avatarUrl : `${(import.meta.env.VITE_API_URL || 'https://172-207-57-215.sslip.io/medquest').replace(/\/$/, '')}${avatarUrl}`}
+                  src={`${(import.meta.env.VITE_API_URL || 'https://172-207-57-215.sslip.io/medquest').replace(/\/$/, '')}/users/${user?.id}/avatar`}
                   alt="Avatar"
                   className="h-20 w-20 rounded-full object-cover ring-2 ring-blue-100"
                 />

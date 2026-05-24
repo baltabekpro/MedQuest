@@ -42,7 +42,7 @@ export const UserProfilePage = () => {
   if (!profile) return <div className="p-8 text-center text-muted">Загрузка...</div>
 
   const avatarSrc = profile.avatar_url
-    ? (profile.avatar_url.startsWith('http') ? profile.avatar_url : `${API_BASE}${profile.avatar_url}`)
+    ? `${API_BASE}/users/${id}/avatar`
     : null
 
   return (
