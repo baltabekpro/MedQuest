@@ -57,33 +57,43 @@ export const LoginPage = () => {
     navigate('/dashboard')
   }
 
-  const handleGoogleCallback = async (credential: string) => {
-    try {
-      const result = await googleLogin(credential)
-      if (result.requires_role_selection && result.temp_token) {
-        setTempToken(result.temp_token)
-        setRoleSelectOpen(true)
-        return
+  const googleCallbackRef = useRef<(credential: string) => void>()
+
+  useEffect(() => {
+    googleCallbackRef.current = async (credential: string) => {
+      console.log('[Google OAuth] callback fired, credential length:', credential?.length)
+      setError('')
+      try {
+        const result = await googleLogin(credential)
+        console.log('[Google OAuth] server response:', result)
+        if (result.requires_role_selection && result.temp_token) {
+          setTempToken(result.temp_token)
+          setRoleSelectOpen(true)
+          return
+        }
+        if (result.requires_2fa) {
+          setError('Для этого аккаунта включена 2FA. Войдите через email/пароль.')
+          return
+        }
+        if (result.access_token && result.refresh_token) {
+          await finishLogin(result.access_token, result.refresh_token)
+        } else {
+          console.warn('[Google OAuth] unexpected response — no tokens and no flags:', result)
+          setError('Неожиданный ответ от сервера')
+        }
+      } catch (err: any) {
+        console.error('[Google OAuth] error:', err)
+        setError(getApiErrorMessage(err))
       }
-      if (result.requires_2fa) {
-        // Google user with 2FA — can't use TOTP here, show message
-        setError('Для этого аккаунта включена 2FA. Войдите через email/пароль.')
-        return
-      }
-      if (result.access_token && result.refresh_token) {
-        await finishLogin(result.access_token, result.refresh_token)
-      }
-    } catch (err) {
-      setError(getApiErrorMessage(err))
     }
-  }
+  })
 
   useEffect(() => {
     if (!GOOGLE_CLIENT_ID || !window.google?.accounts?.id || !googleBtnRef.current) return
 
     window.google.accounts.id.initialize({
       client_id: GOOGLE_CLIENT_ID,
-      callback: (response) => handleGoogleCallback(response.credential),
+      callback: (response) => googleCallbackRef.current?.(response.credential),
     })
 
     window.google.accounts.id.renderButton(googleBtnRef.current, {
@@ -94,7 +104,6 @@ export const LoginPage = () => {
       shape: 'pill',
       locale: 'ru',
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleRoleSelect = async () => {
