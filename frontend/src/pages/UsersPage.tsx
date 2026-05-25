@@ -41,8 +41,8 @@ export const UsersPage = () => {
         <Button className='w-full sm:w-auto' onClick={() => { setEditingUser(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пользователя</Button>
       </div>
       <Input className='mb-4 w-full sm:max-w-sm' placeholder='Поиск по ФИО или email...' value={search} onChange={(e) => setSearch(e.target.value)} />
-      <Table className='min-w-[860px]'>
-        <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Email</TableHead><TableHead>Роль</TableHead><TableHead>Статус</TableHead><TableHead>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
+      <Table>
+        <TableHeader><TableRow><TableHead className='hidden md:table-cell'>ID</TableHead><TableHead>ФИО</TableHead><TableHead className='hidden lg:table-cell'>Email</TableHead><TableHead>Роль</TableHead><TableHead>Статус</TableHead><TableHead className='hidden md:table-cell'>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (
             <TableRow>
@@ -56,16 +56,16 @@ export const UsersPage = () => {
           )}
           {items.map((user) => (
             <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
+              <TableCell className='hidden md:table-cell'>{user.id}</TableCell>
               <TableCell><button type='button' className='text-left font-medium text-blue-600 hover:underline' onClick={() => navigate(`/users/${user.id}/profile`)}>{user.full_name}</button></TableCell>
-              <TableCell>{user.email}</TableCell>
+              <TableCell className='hidden lg:table-cell'>{user.email}</TableCell>
               <TableCell><Badge className={roleClass[user.role]}>{roleLabel[user.role]}</Badge></TableCell>
               <TableCell><Badge className={user.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}>{user.is_active ? 'Активен' : 'Неактивен'}</Badge></TableCell>
-              <TableCell>{new Date(user.created_at).toLocaleDateString('ru-RU')}</TableCell>
+              <TableCell className='hidden md:table-cell'>{new Date(user.created_at).toLocaleDateString('ru-RU')}</TableCell>
               <TableCell>
-                <div className='flex gap-2'>
-                  <button type='button' aria-label='Редактировать' onClick={() => { setEditingUser(user); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
-                  <button type='button' aria-label='Удалить' onClick={() => deleteMutation.mutate(user.id)}><Trash className='h-4 w-4 text-red-600' /></button>
+                <div className='flex gap-1'>
+                  <button type='button' aria-label='Редактировать' className='p-1.5' onClick={() => { setEditingUser(user); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
+                  <button type='button' aria-label='Удалить' className='p-1.5' onClick={() => deleteMutation.mutate(user.id)}><Trash className='h-4 w-4 text-red-600' /></button>
                 </div>
               </TableCell>
             </TableRow>

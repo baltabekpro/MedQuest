@@ -169,14 +169,33 @@ export const ProfilePage = () => {
             </div>
             <Input type="password" placeholder="Новый пароль (мин. 6 символов)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
             <p className="text-sm text-muted">Надежность: {passwordStrength(newPassword)}</p>
-            <Button onClick={async () => { await setPassword(newPassword); toast.success('Пароль установлен') }} disabled={newPassword.length < 6}>Установить пароль</Button>
+            <Button onClick={async () => {
+              try {
+                await setPassword(newPassword)
+                const updated = await getMe()
+                setUser(updated)
+                setNewPassword('')
+                toast.success('Пароль установлен')
+              } catch {
+                toast.error('Ошибка установки пароля')
+              }
+            }} disabled={newPassword.length < 6}>Установить пароль</Button>
           </div>
         ) : (
           <div className="space-y-2">
             <Input type="password" placeholder="Текущий пароль" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
             <Input type="password" placeholder="Новый пароль" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
             <p className="text-sm text-muted">Надежность: {passwordStrength(newPassword)}</p>
-            <Button onClick={async () => { await changePassword(oldPassword, newPassword); toast.success('Пароль изменен') }}>Изменить пароль</Button>
+            <Button onClick={async () => {
+              try {
+                await changePassword(oldPassword, newPassword)
+                setOldPassword('')
+                setNewPassword('')
+                toast.success('Пароль изменён')
+              } catch {
+                toast.error('Ошибка смены пароля')
+              }
+            }}>Изменить пароль</Button>
           </div>
         )}
       </Card>

@@ -1,4 +1,4 @@
-import { MessageSquare, Search, Send, User, UserPlus } from 'lucide-react'
+import { ArrowLeft, MessageSquare, Search, Send, User, UserPlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { Badge } from '@/components/ui/badge'
@@ -29,6 +29,7 @@ export const ChatPage = () => {
   const [text, setText] = useState('')
   const [search, setSearch] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [mobileShowChat, setMobileShowChat] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -50,13 +51,22 @@ export const ChatPage = () => {
     }
   }
 
+  const handleSelectContact = (userId: number) => {
+    selectContact(userId)
+    setMobileShowChat(true)
+  }
+
   const handleSelectStaff = (userId: number) => {
     startChat(userId)
     setDialogOpen(false)
     setSearch('')
+    setMobileShowChat(true)
   }
 
-  // Group staff by role and filter by search
+  const handleBack = () => {
+    setMobileShowChat(false)
+  }
+
   const filteredStaff = search
     ? staff.filter((s) => s.full_name.toLowerCase().includes(search.toLowerCase()))
     : staff
@@ -67,9 +77,14 @@ export const ChatPage = () => {
   }, {})
 
   return (
-    <div className="flex h-[calc(100vh-7rem)] gap-4">
+    <div className="flex h-[calc(100vh-7rem)] md:h-[calc(100vh-7rem)] gap-0 md:gap-4">
       {/* Contact list */}
-      <Card className="flex w-80 flex-col overflow-hidden">
+      <Card
+        className={cn(
+          'flex w-full flex-col overflow-hidden md:w-80',
+          mobileShowChat ? 'hidden md:flex' : 'flex',
+        )}
+      >
         <div className="flex items-center justify-between border-b border-border p-4">
           <h2 className="flex items-center gap-2 text-lg font-semibold text-text">
             <MessageSquare className="h-5 w-5" /> Чат
@@ -137,7 +152,7 @@ export const ChatPage = () => {
             contacts.map((c) => (
               <button
                 key={c.user_id}
-                onClick={() => selectContact(c.user_id)}
+                onClick={() => handleSelectContact(c.user_id)}
                 className={cn(
                   'flex w-full items-center gap-3 border-b border-border px-4 py-3 text-left transition hover:bg-slate-50',
                   activeUserId === c.user_id && 'bg-blue-50 hover:bg-blue-50',
@@ -166,11 +181,24 @@ export const ChatPage = () => {
       </Card>
 
       {/* Chat area */}
-      <Card className="flex flex-1 flex-col overflow-hidden">
+      <Card
+        className={cn(
+          'flex flex-1 flex-col overflow-hidden',
+          mobileShowChat ? 'flex' : 'hidden md:flex',
+        )}
+      >
         {activeUserId && activeContact ? (
           <>
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-border p-4">
+              <button
+                type="button"
+                onClick={handleBack}
+                className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-slate-100 md:hidden"
+                aria-label="Назад"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </button>
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                 <User className="h-5 w-5" />
               </div>
@@ -191,7 +219,7 @@ export const ChatPage = () => {
                 >
                   <div
                     className={cn(
-                      'max-w-[70%] rounded-2xl px-4 py-2 text-sm',
+                      'max-w-[80%] md:max-w-[70%] rounded-2xl px-4 py-2 text-sm',
                       msg.sender_id === user?.id
                         ? 'bg-blue-600 text-white rounded-br-md'
                         : 'bg-slate-100 text-text rounded-bl-md',

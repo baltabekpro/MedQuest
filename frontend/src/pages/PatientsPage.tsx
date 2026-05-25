@@ -45,8 +45,8 @@ export const PatientsPage = () => {
         <Input className='w-full sm:max-w-sm' placeholder='Поиск пациентов...' value={search} onChange={(e) => setSearch(e.target.value)} />
         <Button className='w-full sm:w-auto' onClick={() => { setEditingPatient(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Добавить пациента</Button>
       </div>
-      <Table className='min-w-[980px]'>
-        <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>ФИО</TableHead><TableHead>Дата рождения</TableHead><TableHead>Телефон</TableHead><TableHead>Email</TableHead><TableHead>Адрес</TableHead><TableHead>Дата регистрации</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
+      <Table>
+        <TableHeader><TableRow><TableHead className='hidden md:table-cell'>ID</TableHead><TableHead>ФИО</TableHead><TableHead className='hidden md:table-cell'>Дата рождения</TableHead><TableHead>Телефон</TableHead><TableHead className='hidden lg:table-cell'>Email</TableHead><TableHead className='hidden lg:table-cell'>Адрес</TableHead><TableHead className='hidden md:table-cell'>Дата регистрации</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (
             <TableRow>
@@ -60,22 +60,22 @@ export const PatientsPage = () => {
           )}
           {items.map((patient) => (
             <TableRow key={patient.id}>
-              <TableCell>{patient.id}</TableCell>
+              <TableCell className='hidden md:table-cell'>{patient.id}</TableCell>
               <TableCell className='font-semibold'><Link to={`/patients/${patient.id}`}>{patient.full_name}</Link></TableCell>
-              <TableCell>{formatDate(patient.birth_date)}</TableCell>
+              <TableCell className='hidden md:table-cell'>{formatDate(patient.birth_date)}</TableCell>
               <TableCell>{patient.phone}</TableCell>
-              <TableCell>{patient.email ?? '—'}</TableCell>
-              <TableCell>{patient.address ?? '—'}</TableCell>
-              <TableCell>{formatDate(patient.created_at)}</TableCell>
+              <TableCell className='hidden lg:table-cell'>{patient.email ?? '—'}</TableCell>
+              <TableCell className='hidden lg:table-cell'>{patient.address ?? '—'}</TableCell>
+              <TableCell className='hidden md:table-cell'>{formatDate(patient.created_at)}</TableCell>
               <TableCell>
-                <div className='flex gap-2'>
-                  <Link aria-label='Просмотр' to={`/patients/${patient.id}`}><Eye className='h-4 w-4' /></Link>
-                  <button type='button' aria-label='Скопировать телефон' onClick={() => copyToClipboard(patient.phone, 'Телефон')}><Copy className='h-4 w-4 text-slate-600' /></button>
-                  {patient.email ? <button type='button' aria-label='Скопировать email' onClick={() => copyToClipboard(patient.email!, 'Email')}><Copy className='h-4 w-4 text-blue-600' /></button> : null}
-                  <button type='button' aria-label='Редактировать' onClick={() => { setEditingPatient(patient); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
+                <div className='flex gap-1'>
+                  <Link aria-label='Просмотр' to={`/patients/${patient.id}`} className='p-1.5'><Eye className='h-4 w-4' /></Link>
+                  <button type='button' aria-label='Скопировать телефон' className='p-1.5' onClick={() => copyToClipboard(patient.phone, 'Телефон')}><Copy className='h-4 w-4 text-slate-600' /></button>
+                  {patient.email ? <button type='button' aria-label='Скопировать email' className='hidden p-1.5 sm:inline-flex' onClick={() => copyToClipboard(patient.email!, 'Email')}><Copy className='h-4 w-4 text-blue-600' /></button> : null}
+                  <button type='button' aria-label='Редактировать' className='p-1.5' onClick={() => { setEditingPatient(patient); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
-                      <button type='button' aria-label='Удалить'><Trash className='h-4 w-4 text-red-600' /></button>
+                      <button type='button' aria-label='Удалить' className='p-1.5'><Trash className='h-4 w-4 text-red-600' /></button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogTitle>Удалить пациента?</AlertDialogTitle>

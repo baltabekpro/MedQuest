@@ -44,20 +44,20 @@ export const DashboardPage = () => {
           <h2 className='mb-3 text-lg font-semibold'>
             {user?.role === 'doctor' ? 'Мои последние запросы' : 'Последние запросы'}
           </h2>
-          <Table className='min-w-[700px]'>
+          <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>№</TableHead><TableHead>Пациент</TableHead><TableHead>Заголовок</TableHead><TableHead>Статус</TableHead><TableHead>Дата</TableHead>
+                <TableHead className='hidden md:table-cell'>№</TableHead><TableHead>Пациент</TableHead><TableHead className='hidden md:table-cell'>Заголовок</TableHead><TableHead>Статус</TableHead><TableHead className='hidden md:table-cell'>Дата</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {(requestsQuery.data?.items ?? []).slice(0, 5).map((request) => (
                 <TableRow key={request.id} className='cursor-pointer' onClick={() => navigate(`/requests/${request.id}`)}>
-                  <TableCell>{request.id}</TableCell>
+                  <TableCell className='hidden md:table-cell'>{request.id}</TableCell>
                   <TableCell>{request.patient_full_name ?? request.patient_id}</TableCell>
-                  <TableCell>{request.title}</TableCell>
+                  <TableCell className='hidden md:table-cell'>{request.title}</TableCell>
                   <TableCell><Badge className={statusClass[request.status]}>{statusLabel[request.status]}</Badge></TableCell>
-                  <TableCell>{new Date(request.created_at).toLocaleDateString('ru-RU')}</TableCell>
+                  <TableCell className='hidden md:table-cell'>{new Date(request.created_at).toLocaleDateString('ru-RU')}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

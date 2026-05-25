@@ -31,7 +31,7 @@ export const AuditPage = () => {
 
   return (
     <Card>
-      <div className='mb-4 grid gap-2 md:grid-cols-3 lg:grid-cols-6'>
+      <div className='mb-4 grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
         <div className='flex flex-col gap-1'>
           <label className='text-xs font-medium text-muted-foreground'>Дата от</label>
           <DatePicker value={from} onChange={setFrom} placeholder='ДД.ММ.ГГГГ' />
@@ -88,8 +88,8 @@ export const AuditPage = () => {
           <Button variant='outline'><Download className='mr-2 h-4 w-4' />Экспорт CSV</Button>
         </a>
       </div>
-      <Table className='min-w-[920px]'>
-        <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Дата+время</TableHead><TableHead>Пользователь</TableHead><TableHead>Действие</TableHead><TableHead>Сущность</TableHead><TableHead>Описание</TableHead><TableHead>IP</TableHead></TableRow></TableHeader>
+      <Table>
+        <TableHeader><TableRow><TableHead className='hidden md:table-cell'>ID</TableHead><TableHead>Дата+время</TableHead><TableHead>Пользователь</TableHead><TableHead>Действие</TableHead><TableHead className='hidden md:table-cell'>Сущность</TableHead><TableHead className='hidden lg:table-cell'>Описание</TableHead><TableHead className='hidden lg:table-cell'>IP</TableHead></TableRow></TableHeader>
         <TableBody>
           {auditQuery.isLoading && (
             <TableRow>
@@ -103,13 +103,13 @@ export const AuditPage = () => {
           )}
           {items.map((log) => (
             <TableRow key={log.id}>
-              <TableCell>{log.id}</TableCell>
+              <TableCell className='hidden md:table-cell'>{log.id}</TableCell>
               <TableCell className='font-mono text-xs'>{new Date(log.timestamp).toLocaleString('ru-RU')}</TableCell>
               <TableCell>{log.user_full_name ?? log.user_id}</TableCell>
               <TableCell><Badge className='bg-slate-100 text-slate-700'>{log.action}</Badge></TableCell>
-              <TableCell>{log.entity_type}</TableCell>
-              <TableCell className='max-w-xs truncate' title={JSON.stringify(log.details)}>{Object.keys(log.details).length ? JSON.stringify(log.details) : '—'}</TableCell>
-              <TableCell>{log.ip_address ?? '—'}</TableCell>
+              <TableCell className='hidden md:table-cell'>{log.entity_type}</TableCell>
+              <TableCell className='hidden lg:table-cell max-w-xs truncate' title={JSON.stringify(log.details)}>{Object.keys(log.details).length ? JSON.stringify(log.details) : '—'}</TableCell>
+              <TableCell className='hidden lg:table-cell'>{log.ip_address ?? '—'}</TableCell>
             </TableRow>
           ))}
         </TableBody>

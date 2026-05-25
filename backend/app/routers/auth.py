@@ -490,26 +490,6 @@ def get_sessions(
     ]
 
 
-@router.post("/set-password", response_model=MessageResponse)
-def set_password(
-    payload: SetPasswordRequest,
-    request: Request,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """Any user (including Google users) can set their own password."""
-    current_user.hashed_password = get_password_hash(payload.new_password)
-    current_user.is_google_user = False
-    db.commit()
-    create_audit_log(
-        db, user_id=current_user.id, user_full_name=current_user.full_name,
-        action="UPDATE", entity_type="User", entity_id=current_user.id,
-        ip_address=request.client.host if request.client else None,
-        details={"password_set": True},
-    )
-    return MessageResponse(message="Пароль установлен")
-
-
 @router.post("/logout", response_model=MessageResponse)
 def logout(payload: RefreshRequest):
     REVOKED_REFRESH_TOKENS.add(payload.refresh_token)

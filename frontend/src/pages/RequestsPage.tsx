@@ -154,7 +154,7 @@ export const RequestsPage = () => {
         </div>
       ) : null}
 
-      <div className='mb-4 grid gap-2 md:grid-cols-3 lg:grid-cols-6'>
+      <div className='mb-4 grid gap-2 grid-cols-2 sm:grid-cols-3 lg:grid-cols-6'>
         <div className='flex flex-col gap-1'>
           <label className='text-xs font-medium text-muted-foreground'>Поиск</label>
           <Input placeholder='Введите текст для поиска...' value={search} onChange={(e) => { setSearch(e.target.value); setPage(1) }} />
@@ -220,8 +220,8 @@ export const RequestsPage = () => {
         </div>
         <Button className='w-full sm:w-auto' onClick={() => { setEditing(undefined); setModalOpen(true) }}><Plus className='mr-2 h-4 w-4' />Создать запрос</Button>
       </div>
-      <Table className='min-w-[960px]'>
-        <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Пациент</TableHead><TableHead>Заголовок</TableHead><TableHead>Описание</TableHead><TableHead>Статус</TableHead><TableHead>Приоритет</TableHead><TableHead>Врач</TableHead><TableHead>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
+      <Table>
+        <TableHeader><TableRow><TableHead className='hidden md:table-cell'>ID</TableHead><TableHead>Пациент</TableHead><TableHead>Заголовок</TableHead><TableHead className='hidden lg:table-cell'>Описание</TableHead><TableHead>Статус</TableHead><TableHead className='hidden md:table-cell'>Приоритет</TableHead><TableHead className='hidden md:table-cell'>Врач</TableHead><TableHead className='hidden lg:table-cell'>Дата</TableHead><TableHead>Действия</TableHead></TableRow></TableHeader>
         <TableBody>
           {query.isLoading && (
             <TableRow>
@@ -235,16 +235,16 @@ export const RequestsPage = () => {
           )}
           {items.map((request) => (
             <TableRow key={request.id} className='cursor-pointer' onClick={() => navigate(`/requests/${request.id}`)}>
-              <TableCell>{request.id}</TableCell>
+              <TableCell className='hidden md:table-cell'>{request.id}</TableCell>
               <TableCell><Link to={`/patients/${request.patient_id}`} onClick={(e) => e.stopPropagation()}>{request.patient_full_name ?? request.patient_id}</Link></TableCell>
               <TableCell>{request.title}</TableCell>
-              <TableCell className='max-w-60 truncate'>{request.description}</TableCell>
+              <TableCell className='hidden lg:table-cell max-w-60 truncate'>{request.description}</TableCell>
               <TableCell><Badge className={statusClass[request.status]}>{statusLabel[request.status]}</Badge></TableCell>
-              <TableCell>{request.priority}</TableCell>
-              <TableCell>{request.assigned_doctor_full_name ?? '—'}</TableCell>
-              <TableCell>{new Date(request.created_at).toLocaleDateString('ru-RU')}</TableCell>
+              <TableCell className='hidden md:table-cell'>{request.priority}</TableCell>
+              <TableCell className='hidden md:table-cell'>{request.assigned_doctor_full_name ?? '—'}</TableCell>
+              <TableCell className='hidden lg:table-cell'>{new Date(request.created_at).toLocaleDateString('ru-RU')}</TableCell>
               <TableCell>
-                <button type='button' aria-label='Редактировать' onClick={(e) => { e.stopPropagation(); setEditing(request); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
+                <button type='button' aria-label='Редактировать' className='p-1.5' onClick={(e) => { e.stopPropagation(); setEditing(request); setModalOpen(true) }}><Pencil className='h-4 w-4' /></button>
               </TableCell>
             </TableRow>
           ))}

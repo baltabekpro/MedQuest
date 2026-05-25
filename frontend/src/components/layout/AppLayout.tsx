@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { useState } from 'react'
 import { Header } from '@/components/layout/Header'
 import { Sidebar } from '@/components/layout/Sidebar'
+import { MobileNav } from '@/components/layout/MobileNav'
 
 const titles: Record<string, string> = {
   '/dashboard': 'Dashboard',
@@ -38,10 +39,12 @@ export const AppLayout = () => {
 
       <div className='flex min-h-0 flex-1 flex-col'>
         <Header title={title} onMenuClick={() => setMobileMenuOpen(true)} />
-        <main className='min-h-0 flex-1 overflow-y-auto p-3 sm:p-6'>
+        <main className='min-h-0 flex-1 overflow-y-auto p-3 pb-20 sm:p-6 md:pb-6 animate-fadeIn'>
           <Outlet />
         </main>
       </div>
+
+      <MobileNav />
     </div>
   )
 }
